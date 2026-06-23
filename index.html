@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="theme-color" content="#194a38">
+    
+    <title>Mixtaja - كورسات برمجة وتطوير ويب مجانية</title>
+    <meta name="description" content="منصة Mixtaja التعليمية الرائدة. تعلم HTML, CSS, JavaScript, Firebase مجاناً. كورسات برمجة وتطوير ويب احترافية تناسب جميع المستويات.">
+    <meta name="keywords" content="كورسات برمجة مجانية, كورسات ويب مجانية, تعلم HTML, تعلم CSS, تعلم JavaScript, تعلم Firebase, Free Web Development Courses, HTML Course, CSS Course, JavaScript Course, Firebase Tutorial, Mixtaja">
+    <meta name="author" content="Mixtaja">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.yourdomain.com/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.yourdomain.com/">
+    <meta property="og:title" content="Mixtaja - كورسات برمجة وتطوير ويب مجانية">
+    <meta property="og:description" content="منصة Mixtaja التعليمية الرائدة. ابدأ رحلتك في تعلم البرمجة وتطوير الويب اليوم.">
+    <meta property="og:image" content="logo2.png">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.yourdomain.com/">
+    <meta property="twitter:title" content="Mixtaja - كورسات برمجة وتطوير ويب مجانية">
+    <meta property="twitter:description" content="منصة Mixtaja التعليمية الرائدة. ابدأ رحلتك في تعلم البرمجة وتطوير الويب اليوم.">
+    <meta property="twitter:image" content="logo2.png">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "Mixtaja",
+      "url": "https://www.yourdomain.com/",
+      "logo": "logo2.png",
+      "description": "منصة تعليمية تقدم كورسات مجانية في مجالات البرمجة وتطوير الويب",
+      "sameAs": [
+        "https://discord.gg/XrJHfPTxQp",
+        "https://t.me/ahmedmukah"
+      ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #1a4f3b; /* Dark Green */
+            --primary-hover: #133b2b;
+            --accent-color: #9a7b4f; /* Gold/Brown */
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-color: #fcfbf9;
+            --input-border: #e0e0e0;
+            --white: #ffffff;
+            --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background: url('logo1.png') center center/cover no-repeat fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-dark);
+            position: relative;
+        }
+
+        /* Overlay to ensure form readability over the background */
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(252, 251, 249, 0.8) 0%, rgba(245, 240, 230, 0.4) 100%);
+            z-index: -1;
+            backdrop-filter: blur(2px);
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            gap: 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Brand Side (Left visually, Right in DOM due to RTL) */
+        .brand-section {
+            flex: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .logo-mark {
+            font-size: 5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo-mark::before {
+            content: '\f0e7'; /* Sparkle/Bolt icon */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: -20px;
+            right: -30px;
+            color: var(--accent-color);
+            font-size: 2rem;
+            transform: rotate(15deg);
+        }
+
+        .brand-slogan {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        /* Auth Card (Right visually) */
+        .auth-container {
+            flex: 1;
+            max-width: 480px;
+            width: 100%;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .auth-header p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.5rem; /* Padding left for icon */
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+            background: var(--white);
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(26, 79, 59, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            color: #999;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .input-wrapper input:focus + .input-icon {
+            color: var(--primary-color);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            cursor: pointer;
+            color: #999;
+            font-size: 1rem;
+        }
+
+        /* Form Options (Remember me & Forgot password) */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .forgot-pass {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .forgot-pass:hover {
+            color: var(--primary-hover);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            width: 100%;
+            padding: 0.9rem;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 79, 59, 0.2);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Form Switcher */
+        .form-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-switch span {
+            color: var(--text-light);
+        }
+
+        .form-switch button {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-right: 0.3rem;
+            transition: var(--transition);
+        }
+
+        .form-switch button:hover {
+            color: var(--primary-color);
+        }
+
+        /* Forms Visibility */
+        #register-form {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+
+        /* Social Footer */
+        .social-footer {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-5px);
+            color: var(--white);
+        }
+
+        .social-btn.whatsapp:hover { background: #25D366; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }
+        .social-btn.discord:hover { background: #5865F2; box-shadow: 0 5px 15px rgba(88, 101, 242, 0.3); }
+        .social-btn.telegram:hover { background: #0088cc; box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3); }
+
+        /* Tooltip for social */
+        .social-btn::after {
+            content: attr(aria-label);
+            position: absolute;
+            top: -35px;
+            background: var(--text-dark);
+            color: var(--white);
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            transform: translateY(10px);
+        }
+
+        .social-btn:hover::after {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+                gap: 2rem;
+                padding: 1rem;
+            }
+            .logo-mark {
+                font-size: 4rem;
+            }
+            .auth-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-overlay"></div>
+
+    <main class="main-container">
+        <div class="brand-section">
+            <h1 class="logo-mark">Mixtaja</h1>
+            <p class="brand-slogan">Mixtaja كل ما يهمك</p>
+        </div>
+
+        <div class="auth-container">
+            <div class="auth-card">
+                
+                <div id="login-form" class="fade-in">
+                    <div class="auth-header">
+                        <h2>مرحبًا بك في Mixtaja</h2>
+                        <p>سجل دخولك للاستمتاع بكافة الخدمات</p>
+                    </div>
+
+                    <form id="form-login">
+                        <div class="form-group">
+                            <label for="login-email">البريد الإلكتروني</label>
+                            <div class="input-wrapper">
+                                <input type="email" id="login-email" placeholder="أدخل بريدك الإلكتروني" required autocomplete="email" aria-label="البريد الإلكتروني">
+                                <i class="fa-regular fa-envelope input-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="login-password">كلمة المرور</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="login-password" placeholder="أدخل كلمة المرور" required autocomplete="current-password" aria-label="كلمة المرور">
+                                <i class="fa-solid fa-lock input-icon"></i>
+                                <i class="fa-regular fa-eye toggle-password" onclick="togglePassword('login-password', this)"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="remember-me">
+                                <input type="checkbox" id="remember">
+                                <span>تذكرني</span>
+                            </label>
+                            <a href="#" class="forgot-pass">نسيت كلمة المرور؟</a>
+                        </div>
+
+                        <button type="submit" class="btn-primary" id="btn-login">
+                            <span class="btn-text">تسجيل دخول</span>
+                            <div class="loader" id="loader-login"></div>
+                        </button>
+                    </form>
+
+                    <div class="form-switch">
+                        <span>ليس لديك حساب؟</span>
+                        <button type="button" onclick="switchForm('register')">إنشاء حساب</button>
+                    </div>
+                </div>
+
+                <div id="register-form">
+                    <div class="auth-header">
+                        <h2>إنشاء حساب جديد</h2>
+                        <p>انضم إلى Mixtaja وابدأ رحلتك</p>
+                    </div>
+
+                    <form id="form-register">
+                        <div class="form-group">
+                            <label for="reg-name">الاسم الكامل</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="reg-name" placeholder="أدخل اسمك الكامل" required autocomplete="name" aria-label="الاسم الكامل">
+                                <i class="fa-regular fa-user input-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg-email">البريد الإلكتروني</label>
+                            <div class="input-wrapper">
+                                <input type="email" id="reg-email" placeholder="أدخل بريدك الإلكتروني" required autocomplete="email" aria-label="البريد الإلكتروني">
+                                <i class="fa-regular fa-envelope input-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg-password">كلمة المرور</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="reg-password" placeholder="أدخل كلمة المرور" required autocomplete="new-password" aria-label="كلمة المرور">
+                                <i class="fa-solid fa-lock input-icon"></i>
+                                <i class="fa-regular fa-eye toggle-password" onclick="togglePassword('reg-password', this)"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg-confirm-password">تأكيد كلمة المرور</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="reg-confirm-password" placeholder="أعد إدخال كلمة المرور" required autocomplete="new-password" aria-label="تأكيد كلمة المرور">
+                                <i class="fa-solid fa-lock input-icon"></i>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" id="btn-register">
+                            <span class="btn-text">إنشاء الحساب</span>
+                            <div class="loader" id="loader-register"></div>
+                        </button>
+                    </form>
+
+                    <div class="form-switch">
+                        <span>لديك حساب بالفعل؟</span>
+                        <button type="button" onclick="switchForm('login')">تسجيل دخول</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="social-footer">
+        <a href="https://wa.me/201124680211" target="_blank" class="social-btn whatsapp" aria-label="تواصل عبر واتساب">
+            <i class="fa-brands fa-whatsapp"></i>
+        </a>
+        <a href="https://discord.gg/XrJHfPTxQp" target="_blank" class="social-btn discord" aria-label="سيرفر ديسكورد">
+            <i class="fa-brands fa-discord"></i>
+        </a>
+        <a href="https://t.me/ahmedmukah" target="_blank" class="social-btn telegram" aria-label="تواصل عبر تيليجرام">
+            <i class="fa-brands fa-telegram"></i>
+        </a>
+    </footer>
+
+    <script>
+        // Toggle Password Visibility
+        function togglePassword(inputId, iconElement) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                iconElement.classList.remove('fa-eye');
+                iconElement.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                iconElement.classList.remove('fa-eye-slash');
+                iconElement.classList.add('fa-eye');
+            }
+        }
+
+        // Switch between Login and Register forms smoothly
+        function switchForm(formType) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+
+            if (formType === 'register') {
+                loginForm.style.display = 'none';
+                loginForm.classList.remove('fade-in');
+                registerForm.style.display = 'block';
+                registerForm.classList.add('fade-in');
+            } else {
+                registerForm.style.display = 'none';
+                registerForm.classList.remove('fade-in');
+                loginForm.style.display = 'block';
+                loginForm.classList.add('fade-in');
+            }
+        }
+
+        // Setup loading states
+        function setLoading(btnId, loaderId, isLoading, defaultText) {
+            const btn = document.getElementById(btnId);
+            const loader = document.getElementById(loaderId);
+            const textSpan = btn.querySelector('.btn-text');
+            
+            if (isLoading) {
+                btn.disabled = true;
+                textSpan.style.display = 'none';
+                loader.style.display = 'block';
+                btn.style.opacity = '0.8';
+            } else {
+                btn.disabled = false;
+                textSpan.style.display = 'inline-block';
+                textSpan.textContent = defaultText;
+                loader.style.display = 'none';
+                btn.style.opacity = '1';
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+
+        // إعدادات فايربيز الجديدة المحدثة
+        const firebaseConfig = {
+          apiKey: "AIzaSyCv0C8nEmkov22ZM1vVtgbagQnMnQbvB24",
+          authDomain: "mixtaja-45134.firebaseapp.com",
+          projectId: "mixtaja-45134",
+          storageBucket: "mixtaja-45134.firebasestorage.app",
+          messagingSenderId: "483029414968",
+          appId: "1:483029414968:web:12dda1c2c61b199916a2cd",
+          measurementId: "G-JHWQNH08YY"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // ================= Login Logic =================
+        document.getElementById('form-login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            setLoading('btn-login', 'loader-login', true, '');
+
+            try {
+                // محاكاة تأخير لتجهيز البيانات وإعطاء مظهر سلس
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // تسجيل الدخول عبر فايربيز
+                await signInWithEmailAndPassword(auth, email, password);
+                
+                // التوجيه بناءً على البريد الإلكتروني المدخل فقط
+                if (email === '0@gmail.com') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'p1.html';
+                }
+            } catch (error) {
+                console.error("Login Error: ", error);
+                alert("خطأ في تسجيل الدخول. تأكد من البريد الإلكتروني وكلمة المرور.");
+                setLoading('btn-login', 'loader-login', false, 'تسجيل دخول');
+            }
+        });
+
+        // ================= Register Logic =================
+        document.getElementById('form-register').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm-password').value;
+
+            if (password !== confirmPassword) {
+                alert("كلمات المرور غير متطابقة!");
+                return;
+            }
+
+            setLoading('btn-register', 'loader-register', true, '');
+
+            try {
+                // محاكاة تأخير
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // إنشاء المستخدم
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // حفظ بيانات المستخدم في Firestore
+                await setDoc(doc(db, "users", user.uid), {
+                    fullName: name,
+                    email: email,
+                    createdAt: new Date().toISOString()
+                });
+
+                alert("تم إنشاء الحساب بنجاح! جاري تحويلك...");
+                
+                // التوجيه بعد إنشاء الحساب
+                if (email === '0@gmail.com') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'p1.html';
+                }
+
+            } catch (error) {
+                console.error("Registration Error: ", error);
+                let errorMessage = "حدث خطأ أثناء إنشاء الحساب.";
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = "البريد الإلكتروني مستخدم بالفعل.";
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = "كلمة المرور ضعيفة جداً.";
+                }
+                alert(errorMessage);
+                setLoading('btn-register', 'loader-register', false, 'إنشاء الحساب');
+            }
+        });
+    </script>
+</body>
+</html>
