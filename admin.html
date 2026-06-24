@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="theme-color" content="#194a38">
+    
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    
+    <title>Mixtaja - لوحة الإدارة</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #1a4f3b;
+            --primary-hover: #133b2b;
+            --accent-color: #9a7b4f;
+            --text-dark: #333333;
+            --bg-color: #fcfbf9;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --danger: #dc3545;
+            --success: #28a745;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
+
+        body {
+            background: #f4f2ee;
+            min-height: 100vh; color: var(--text-dark);
+            display: flex; flex-direction: column;
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            background: var(--primary-color); padding: 1rem 2rem; box-shadow: var(--shadow);
+            display: flex; justify-content: space-between; align-items: center; color: var(--white);
+        }
+        .brand { font-size: 1.6rem; font-weight: 800; color: var(--white); }
+        .brand span { color: var(--accent-color); }
+        .btn-logout { background: none; border: none; color: #ffbcbc; font-weight: 600; cursor: pointer; font-size: 1rem; }
+
+        /* حاوية التبويبات */
+        .tabs-container {
+            display: flex; background: var(--white); box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            justify-content: center; gap: 2rem; padding: 0.5rem 0;
+        }
+        .tab-btn {
+            background: none; border: none; padding: 0.8rem 1.5rem; font-size: 1.1rem; font-weight: 700;
+            color: #666; cursor: pointer; transition: var(--transition); border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            color: var(--primary-color); border-bottom-color: var(--accent-color);
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content { max-width: 1300px; width: 100%; margin: 2rem auto; padding: 0 1.5rem; flex: 1; }
+        .panel-section { display: none; }
+        .panel-section.active { display: block; }
+
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;
+        }
+        .section-title { color: var(--primary-color); font-size: 1.4rem; }
+        
+        .btn-add-new {
+            background: var(--accent-color); color: var(--white); border: none; padding: 0.6rem 1.2rem;
+            border-radius: 6px; font-weight: bold; cursor: pointer; transition: var(--transition);
+        }
+        .btn-add-new:hover { background: #82663f; }
+
+        /* جداول وقوائم البيانات */
+        .data-card {
+            background: var(--white); border-radius: 12px; box-shadow: var(--shadow); padding: 1.5rem; overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; text-align: right; }
+        th, td { padding: 1rem; border-bottom: 1px solid #eee; }
+        th { color: var(--primary-color); font-weight: 700; background: #fafd9; }
+
+        /* التحكم في الكاشات */
+        .cash-control { display: flex; align-items: center; gap: 5px; }
+        .cash-input { width: 70px; padding: 0.4rem; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
+        .btn-cash { border: none; padding: 0.4rem 0.8rem; border-radius: 4px; color: white; cursor: pointer; font-weight: bold; }
+        .btn-cash.add { background: var(--success); }
+        .btn-cash.sub { background: var(--danger); }
+
+        /* بطاقات الكورسات في لوحة الأدمن */
+        .admin-courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+        .admin-course-card {
+            background: var(--white); border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow);
+            border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .admin-course-title { color: var(--primary-color); font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 700; }
+        .admin-course-price { color: var(--accent-color); font-weight: bold; margin-bottom: 1rem; }
+        .admin-course-meta { font-size: 0.9rem; color: #666; margin-bottom: 1rem; }
+        .admin-course-actions { display: flex; gap: 10px; margin-top: auto; }
+        .btn-action {
+            flex: 1; padding: 0.5rem; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: var(--transition);
+        }
+        .btn-edit { background: #e0a800; color: #fff; }
+        .btn-delete { background: var(--danger); color: #fff; }
+
+        /* النوافذ المنبثقة للنموذج */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center; z-index: 2000;
+            opacity: 0; visibility: hidden; transition: var(--transition);
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: var(--white); border-radius: 15px; padding: 2rem; width: 95%; max-width: 600px;
+            max-height: 85vh; overflow-y: auto; position: relative;
+        }
+        .close-modal { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; color: #999; cursor: pointer; }
+        
+        /* فورم الكورس */
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: bold; color: var(--primary-color); }
+        .form-group input { width: 100%; padding: 0.7rem; border: 1px solid #ddd; border-radius: 6px; outline: none; }
+        .form-group input:focus { border-color: var(--accent-color); }
+        
+        .sub-section { border: 1px solid #eee; padding: 1rem; border-radius: 8px; background: #fafafa; margin-bottom: 1rem; }
+        .sub-section-title { font-size: 1rem; color: var(--accent-color); margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        
+        .dynamic-row { display: flex; gap: 10px; margin-bottom: 0.5rem; align-items: center; }
+        .dynamic-row input { flex: 1; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
+        .btn-remove-row { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.2rem; }
+        .btn-add-row { background: none; border: none; color: var(--primary-color); cursor: pointer; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+
+        .btn-submit {
+            width: 100%; padding: 0.9rem; background: var(--primary-color); color: var(--white);
+            border: none; border-radius: 6px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 1rem;
+        }
+
+        /* شاشة التحميل الحامية */
+        .page-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center;
+        }
+        .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="page-loader" id="page-loader"><div class="spinner"></div></div>
+
+    <nav class="navbar">
+        <div class="brand">لوحة تحكم <span>الأدمن المنصة</span></div>
+        <button class="btn-logout" onclick="logout()">تسجيل الخروج</button>
+    </nav>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="switchTab('users-section', this)"><i class="fa-solid fa-users"></i> إدارة المشتركين</button>
+        <button class="tab-btn" onclick="switchTab('courses-section', this)"><i class="fa-solid fa-graduation-cap"></i> إدارة الكورسات</button>
+    </div>
+
+    <main class="main-content">
+
+        <section id="users-section" class="panel-section active">
+            <div class="section-header">
+                <h2 class="section-title">قائمة الطلاب والمشتركين المسجلين</h2>
+            </div>
+            <div class="data-card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الاسم الكامل</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>رصيد كاشات mix الحالي</th>
+                            <th>تعديل الرصيد (إضافة / سحب)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="courses-section" class="panel-section">
+            <div class="section-header">
+                <h2 class="section-title">الكورسات المرفوعة على المنصة</h2>
+                <button class="btn-add-new" onclick="openCourseModal()"><i class="fa-solid fa-plus"></i> إضافة كورس جديد</button>
+            </div>
+            <div class="admin-courses-grid" id="admin-courses-container">
+                </div>
+        </section>
+
+    </main>
+
+    <div class="modal-overlay" id="courseModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeCourseModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="modal-title" id="modal-form-title">إضافة كورس جديد</h3>
+            
+            <form id="course-form">
+                <input type="hidden" id="course-edit-id">
+                
+                <div class="form-group">
+                    <label>عنوان الكورس الرئيسي</label>
+                    <input type="text" id="course-title" required placeholder="مثال: كورس أساسيات جافاسكريبت">
+                </div>
+                
+                <div class="form-group">
+                    <label>سعر الكورس (بـ كاشات mix)</label>
+                    <input type="number" id="course-price" required placeholder="مثال: 100">
+                </div>
+
+                <div class="sub-section">
+                    <div class="sub-section-title">
+                        <span>قائمة الدروس (قائمة فيديوهات اليوتيوب)</span>
+                        <button type="button" class="btn-add-row" onclick="addLessonRow()"><i class="fa-solid fa-plus"></i> إضافة درس</button>
+                    </div>
+                    <div id="lessons-rows-container">
+                        </div>
+                </div>
+
+                <div class="sub-section">
+                    <div class="sub-section-title">
+                        <span>ملفات وملحقات الكورس (روابط تحميل الملفات)</span>
+                        <button type="button" class="btn-add-row" onclick="addFileRow()"><i class="fa-solid fa-plus"></i> إضافة ملف</button>
+                    </div>
+                    <div id="files-rows-container">
+                        </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="btn-save-course">حفظ الكورس ونشره</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(sectionId, element) {
+            document.querySelectorAll('.panel-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            element.classList.add('active');
+        }
+
+        function openCourseModal() {
+            document.getElementById('course-form').reset();
+            document.getElementById('course-edit-id').value = '';
+            document.getElementById('modal-form-title').innerText = 'إضافة كورس جديد';
+            document.getElementById('lessons-rows-container').innerHTML = '';
+            document.getElementById('files-rows-container').innerHTML = '';
+            // تلقائياً نضع سطر واحد فارغ لكل منهما لتسهيل الإدخال
+            addLessonRow();
+            addFileRow();
+            document.getElementById('courseModal').classList.add('active');
+        }
+
+        function closeCourseModal() {
+            document.getElementById('courseModal').classList.remove('active');
+        }
+
+        // إضافة حقول درس يوتيوب ديناميكياً
+        function addLessonRow(title = '', videoId = '') {
+            const container = document.getElementById('lessons-rows-container');
+            const row = document.createElement('div');
+            row.className = 'dynamic-row lesson-data-row';
+            row.innerHTML = `
+                <input type="text" placeholder="عنوان الدرس" class="lesson-title-input" value="${title}" required>
+                <input type="text" placeholder="ID فيديو اليوتيوب فقط" class="lesson-id-input" value="${videoId}" required>
+                <button type="button" class="btn-remove-row" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash-can"></i></button>
+            `;
+            container.appendChild(row);
+        }
+
+        // إضافة حقول ملفات ديناميكياً
+        function addFileRow(name = '', link = '') {
+            const container = document.getElementById('files-container') ? document.getElementById('files-container') : document.getElementById('files-rows-container');
+            const row = document.createElement('div');
+            row.className = 'dynamic-row file-data-row';
+            row.innerHTML = `
+                <input type="text" placeholder="اسم الملف / المذكرة" class="file-name-input" value="${name}">
+                <input type="text" placeholder="رابط التحويل للملف" class="file-link-input" value="${link}">
+                <button type="button" class="btn-remove-row" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash-can"></i></button>
+            `;
+            container.appendChild(row);
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyCv0C8nEmkov22ZM1vVtgbagQnMnQbvB24",
+          authDomain: "mixtaja-45134.firebaseapp.com",
+          projectId: "mixtaja-45134",
+          storageBucket: "mixtaja-45134.firebasestorage.app",
+          messagingSenderId: "483029414968",
+          appId: "1:483029414968:web:12dda1c2c61b199916a2cd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // 1. التحقق الصارم والأمان التام من هوية المسؤول الأدمن
+        onAuthStateChanged(auth, (user) => {
+            if (!user || user.email !== '0@gmail.com') {
+                // طرد فوري لأي متطفل يحاول الدخول
+                alert('عفواً! ليس لديك صلاحيات دخول صفحة الإدارة.');
+                window.location.href = 'index.html';
+            } else {
+                // إذا كان الأدمن الصحيح نقوم بإخفاء شاشة التحميل وتشغيل لوحة المراقبة الحية
+                document.getElementById('page-loader').style.display = 'none';
+                listenToUsers();
+                listenToCourses();
+            }
+        });
+
+        // تسجيل خروج الأدمن
+        window.logout = () => {
+            signOut(auth).then(() => window.location.href = 'index.html');
+        };
+
+        // 2. مراقبة وجلب كل المستخدمين المسجلين في النظام بالوقت الفعلي (Real-time)
+        function listenToUsers() {
+            onSnapshot(collection(db, "users"), (snapshot) => {
+                const tbody = document.getElementById('users-table-body');
+                tbody.innerHTML = '';
+                
+                snapshot.forEach((userDoc) => {
+                    const userData = userDoc.data();
+                    // تخطي إظهار حساب الأدمن نفسه في جدول الرصيد لتجنب الخطأ
+                    if(userData.email === '0@gmail.com') return;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${userData.fullName || 'بدون اسم'}</strong></td>
+                        <td>${userData.email}</td>
+                        <td><span style="color:var(--accent-color); font-weight:bold;">${userData.mixCash || 0}</span> كاش</td>
+                        <td>
+                            <div class="cash-control">
+                                <input type="number" class="cash-input" id="amount-${userDoc.id}" placeholder="المبلغ" min="1">
+                                <button class="btn-cash add" onclick="window.modifyCash('${userDoc.id}', true)"><i class="fa-solid fa-plus"></i> إضافة</button>
+                                <button class="btn-cash sub" onclick="window.modifyCash('${userDoc.id}', false)"><i class="fa-solid fa-minus"></i> سحب</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        // دالة إضافة وسحب كاشات الطلاب
+        window.modifyCash = async (userId, isAdding) => {
+            const input = document.getElementById(`amount-${userId}`);
+            const value = parseInt(input.value);
+            
+            if (isNaN(value) || value <= 0) {
+                alert('يرجى إدخال مبلغ صحيح أكبر من الصفر.');
+                return;
+            }
+
+            const change = isAdding ? value : -value;
+            const userRef = doc(db, "users", userId);
+
+            try {
+                await updateDoc(userRef, {
+                    mixCash: increment(change)
+                });
+                input.value = ''; // تصفير الحقل
+            } catch (error) {
+                console.error("Error adjusting cash:", error);
+                alert("حدث خطأ في قاعدة البيانات أثناء تعديل رصيد الطالب.");
+            }
+        };
+
+        // 3. مراقبة وجلب الكورسات المخزنة في الـ Firestore
+        let allLiveCourses = [];
+        function listenToCourses() {
+            onSnapshot(collection(db, "courses"), (snapshot) => {
+                const container = document.getElementById('admin-courses-container');
+                container.innerHTML = '';
+                allLiveCourses = [];
+
+                snapshot.forEach((courseDoc) => {
+                    const course = courseDoc.data();
+                    course.id = courseDoc.id;
+                    allLiveCourses.push(course);
+
+                    const lessonsCount = course.lessons ? course.lessons.length : 0;
+                    const filesCount = course.files ? course.files.length : 0;
+
+                    const card = document.createElement('div');
+                    card.className = 'admin-course-card';
+                    card.innerHTML = `
+                        <div>
+                            <div class="admin-course-title">${course.title}</div>
+                            <div class="admin-course-price">السعر: ${course.price} كاش mix</div>
+                            <div class="admin-course-meta">
+                                <div><i class="fa-solid fa-play"></i> عدد الدروس المرفوعة: ${lessonsCount}</div>
+                                <div style="margin-top: 4px;"><i class="fa-solid fa-file"></i> الملفات الملحقة: ${filesCount}</div>
+                            </div>
+                        </div>
+                        <div class="admin-course-actions">
+                            <button class="btn-action btn-edit" onclick="window.prepareEditCourse('${course.id}')"><i class="fa-solid fa-pen-to-square"></i> تعديل</button>
+                            <button class="btn-action btn-delete" onclick="window.deleteCourse('${course.id}')"><i class="fa-solid fa-trash-can"></i> حذف</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        // 4. معالجة وحفظ الكورس الجديد أو المعدل في الـ Firestore
+        document.getElementById('course-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btnSave = document.getElementById('btn-save-course');
+            btnSave.innerText = 'جاري الحفظ والرفع...';
+            btnSave.disabled = true;
+
+            const courseId = document.getElementById('course-edit-id').value;
+            const title = document.getElementById('course-title').value;
+            const price = parseInt(document.getElementById('course-price').value);
+
+            // تجميع الدروس والفيديوهات من الحقول الديناميكية المضافة
+            const lessons = [];
+            document.querySelectorAll('.lesson-data-row').forEach(row => {
+                const lTitle = row.querySelector('.lesson-title-input').value;
+                const lId = row.querySelector('.lesson-id-input').value;
+                if(lTitle && lId) {
+                    lessons.push({ title: lTitle, videoId: lId });
+                }
+            });
+
+            // تجميع الملفات والروابط الملحقة
+            const files = [];
+            document.querySelectorAll('.file-data-row').forEach(row => {
+                const fName = row.querySelector('.file-name-input').value;
+                const fLink = row.querySelector('.file-link-input').value;
+                if(fName && fLink) {
+                    files.push({ name: fName, link: fLink });
+                }
+            });
+
+            // تحديد ما إذا كان إضافة جديدة أو تعديل على كورس حالي
+            const targetDocRef = courseId ? doc(db, "courses", courseId) : doc(collection(db, "courses"));
+
+            try {
+                await setDoc(targetDocRef, {
+                    title: title,
+                    price: price,
+                    lessonsCount: lessons.length,
+                    lessons: lessons,
+                    files: files
+                }, { merge: true });
+
+                closeCourseModal();
+                alert("تم حفظ ونشر الكورس على المنصة بنجاح!");
+            } catch (error) {
+                console.error("Error saving course:", error);
+                alert("فشل رفع الكورس، تحقق من اتصالك بالإنترنت.");
+            }
+
+            btnSave.innerText = 'حفظ الكورس ونشره';
+            btnSave.disabled = false;
+        });
+
+        // فتح الكورس للتعديل وجلب بياناته داخل الفورم تلقائياً
+        window.prepareEditCourse = (courseId) => {
+            const course = allLiveCourses.find(c => c.id === courseId);
+            if(!course) return;
+
+            document.getElementById('course-edit-id').value = course.id;
+            document.getElementById('course-title').value = course.title;
+            document.getElementById('course-price').value = course.price;
+
+            document.getElementById('lessons-rows-container').innerHTML = '';
+            if(course.lessons && course.lessons.length > 0) {
+                course.lessons.forEach(l => addLessonRow(l.title, l.videoId));
+            } else { addLessonRow(); }
+
+            document.getElementById('files-rows-container').innerHTML = '';
+            if(course.files && course.files.length > 0) {
+                course.files.forEach(f => addFileRow(f.name, f.link));
+            } else { addFileRow(); }
+
+            document.getElementById('modal-form-title').innerText = 'تعديل بيانات الكورس';
+            document.getElementById('courseModal').classList.add('active');
+        };
+
+        // دالة حذف الكورس من قاعدة البيانات
+        window.deleteCourse = async (courseId) => {
+            if(confirm("هل أنت متأكد تماماً من حذف هذا الكورس نهائياً من المنصة؟")) {
+                try {
+                    await deleteDoc(doc(db, "courses", courseId));
+                    alert("تم حذف الكورس بنجاح.");
+                } catch (error) {
+                    alert("فشل الحذف، يرجى المحاولة لاحقاً.");
+                }
+            }
+        };
+    </script>
+</body>
+</html>
