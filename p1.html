@@ -23,8 +23,9 @@
             --text-dark: #333333;
             --bg-color: #fcfbf9;
             --white: #ffffff;
+            --danger: #dc3545;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            --transition: all 0.3s ease;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
@@ -32,45 +33,103 @@
         body {
             background: url('logo1.png') center center/cover fixed;
             min-height: 100vh; color: var(--text-dark);
+            overflow-x: hidden;
         }
 
         .bg-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(252, 251, 249, 0.95) 0%, rgba(245, 240, 230, 0.85) 100%);
-            z-index: -1; backdrop-filter: blur(5px);
+            background: linear-gradient(135deg, rgba(252, 251, 249, 0.96) 0%, rgba(245, 240, 230, 0.88) 100%);
+            z-index: -1; backdrop-filter: blur(6px);
         }
 
         /* شريط التنقل */
         .navbar {
             background: rgba(255, 255, 255, 0.95); padding: 1rem 2rem; box-shadow: var(--shadow);
             display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
+            position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
         }
 
-        .brand { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); }
-        .nav-tools { display: flex; align-items: center; gap: 1.5rem; }
+        .brand { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); letter-spacing: 0.5px; }
+        .nav-tools { display: flex; align-items: center; gap: 1.2rem; }
 
         .coins-badge {
             background: rgba(154, 123, 79, 0.1); border: 1px solid var(--accent-color);
-            padding: 0.5rem 1rem; border-radius: 20px; display: flex; align-items: center;
+            padding: 0.5rem 1rem; border-radius: 50px; display: flex; align-items: center;
             gap: 0.8rem; font-weight: 700; color: var(--primary-color);
         }
         .coins-amount { color: var(--accent-color); font-size: 1.2rem; }
 
         .btn-add {
             background: var(--accent-color); color: var(--white); border: none;
-            width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+            width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
             display: flex; align-items: center; justify-content: center; transition: var(--transition);
         }
-        .btn-add:hover { transform: scale(1.1); background: var(--primary-color); }
+        .btn-add:hover { transform: scale(1.1) rotate(90deg); background: var(--primary-color); }
 
-        .btn-logout { background: none; border: none; color: #dc3545; font-weight: 600; cursor: pointer; font-size: 1rem; }
+        /* نظام الإشعارات العلوي */
+        .notif-container { position: relative; display: flex; align-items: center; }
+        .notif-bell-btn {
+            background: none; border: none; color: var(--primary-color); font-size: 1.4rem;
+            cursor: pointer; position: relative; padding: 5px; transition: var(--transition);
+        }
+        .notif-bell-btn:hover { color: var(--accent-color); transform: scale(1.05); }
+        
+        .notif-bell-btn.shake i { animation: bell-ring 0.6s ease-in-out infinite alternate; }
+        @keyframes bell-ring {
+            0% { transform: rotate(-15deg); }
+            100% { transform: rotate(15deg); }
+        }
 
-        /* الكورسات */
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .notif-badge {
+            position: absolute; top: 0; right: 0; background: var(--danger); color: var(--white);
+            font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+            border: 2px solid var(--white); box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .notif-dropdown {
+            position: absolute; top: 45px; left: 0; width: 340px; background: var(--white);
+            border-radius: 12px; box-shadow: 0 10px 35px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.06);
+            display: none; flex-direction: column; overflow: hidden; z-index: 110;
+            transform-origin: top left; animation: growDown 0.3s ease forwards;
+        }
+        .notif-dropdown.active { display: flex; }
+        
+        @keyframes growDown {
+            0% { transform: scaleY(0); opacity: 0; }
+            100% { transform: scaleY(1); opacity: 1; }
+        }
+
+        .notif-header {
+            background: #faf8f5; padding: 1rem; border-bottom: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .notif-header h4 { color: var(--primary-color); font-weight: 700; }
+        .btn-clear-notif { background: none; border: none; color: #888; font-size: 0.85rem; cursor: pointer; font-weight: bold;}
+        .btn-clear-notif:hover { color: var(--danger); }
+
+        .notif-body { max-height: 280px; overflow-y: auto; }
+        .notif-item {
+            padding: 1rem; border-bottom: 1px solid #f5f5f5; display: flex; gap: 10px;
+            align-items: flex-start; transition: var(--transition); cursor: default;
+        }
+        .notif-item:hover { background: #fdfcfb; }
+        .notif-item i { font-size: 1.1rem; margin-top: 3px; }
+        .notif-item.unread { background: rgba(26, 79, 59, 0.03); }
+        .notif-item-text { display: flex; flex-direction: column; gap: 4px; }
+        .notif-msg { font-size: 0.9rem; color: var(--text-dark); line-height: 1.4; font-weight: 500; }
+        .notif-time { font-size: 0.75rem; color: #999; }
+        
+        .notif-empty { padding: 2rem; text-align: center; color: #aaa; font-weight: bold; font-size: 0.95rem; }
+
+        .btn-logout { background: none; border: none; color: var(--danger); font-weight: 700; cursor: pointer; font-size: 1rem; transition: var(--transition); }
+        .btn-logout:hover { opacity: 0.8; }
+
+        /* الكورسات والمحتوى الرئيسي */
+        .container { max-width: 1200px; margin: 2.5rem auto; padding: 0 2rem; }
         .section-title {
-            margin-bottom: 2rem; color: var(--primary-color); font-size: 1.5rem;
-            border-right: 4px solid var(--accent-color); padding-right: 10px;
+            margin-bottom: 2rem; color: var(--primary-color); font-size: 1.6rem; font-weight: 800;
+            border-right: 5px solid var(--accent-color); padding-right: 12px;
         }
 
         .courses-grid {
@@ -78,41 +137,43 @@
         }
 
         .course-card {
-            background: var(--white); border-radius: 15px; overflow: hidden;
-            box-shadow: var(--shadow); transition: var(--transition); border: 1px solid rgba(0,0,0,0.05);
-            position: relative;
+            background: var(--white); border-radius: 16px; overflow: hidden;
+            box-shadow: var(--shadow); transition: var(--transition); border: 1px solid rgba(0,0,0,0.04);
+            position: relative; display: flex; flex-direction: column;
         }
-        .course-card:hover { transform: translateY(-5px); }
+        .course-card:hover { transform: translateY(-6px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
 
         .course-thumbnail {
-            width: 100%; height: 180px; background: var(--primary-color);
-            display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 3rem;
+            width: 100%; height: 180px; background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 3.5rem;
             position: relative;
         }
 
         /* قفل الكورس */
         .locked-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); display: flex; flex-direction: column;
+            background: rgba(0,0,0,0.65); display: flex; flex-direction: column;
             align-items: center; justify-content: center; color: var(--white); z-index: 2;
+            backdrop-filter: blur(2px);
         }
-        .locked-overlay i { font-size: 3rem; margin-bottom: 10px; color: var(--accent-color); }
+        .locked-overlay i { font-size: 2.8rem; margin-bottom: 8px; color: var(--accent-color); }
 
-        .course-info { padding: 1.5rem; }
-        .course-title { font-size: 1.2rem; color: var(--primary-color); margin-bottom: 0.5rem; }
-        .course-meta { color: #666; font-size: 0.9rem; margin-bottom: 1rem; }
-        .course-price { color: var(--accent-color); font-weight: bold; font-size: 1.1rem; }
+        .course-info { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .course-title { font-size: 1.25rem; color: var(--primary-color); margin-bottom: 0.6rem; font-weight: 700; }
+        .course-meta { color: #666; font-size: 0.9rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 6px; }
+        .course-price { color: var(--accent-color); font-weight: 800; font-size: 1.15rem; }
 
         .btn-action {
-            width: 100%; padding: 0.8rem; border: none; border-radius: 8px; font-weight: bold;
+            width: 100%; padding: 0.85rem; border: none; border-radius: 10px; font-weight: bold;
             cursor: pointer; transition: var(--transition); margin-top: 1rem; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn-buy { background: var(--accent-color); color: var(--white); }
         .btn-buy:hover { background: #82663f; }
         .btn-open { background: var(--primary-color); color: var(--white); }
         .btn-open:hover { background: var(--primary-hover); }
 
-        /* نافذة مشاهدة الكورس (Video + Playlist) */
+        /* واجهة مشغل الكورس المتكاملة والمطورة */
         .course-viewer-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-color); z-index: 1000;
@@ -121,151 +182,150 @@
         .course-viewer-modal.active { display: flex; }
 
         .viewer-header {
-            background: var(--white); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex; justify-content: space-between; align-items: center;
+            background: var(--white); padding: 1.2rem 2rem; box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+            display: flex; justify-content: space-between; align-items: center; z-index: 10;
         }
-        .viewer-title { color: var(--primary-color); font-weight: bold; font-size: 1.2rem; }
-        .btn-close-viewer { background: none; border: none; font-size: 1.5rem; color: #dc3545; cursor: pointer; }
+        .viewer-title { color: var(--primary-color); font-weight: 800; font-size: 1.3rem; }
+        .btn-close-viewer { background: none; border: none; font-size: 1.6rem; color: var(--danger); cursor: pointer; transition: var(--transition); }
+        .btn-close-viewer:hover { transform: scale(1.1); }
 
         .viewer-content {
-            display: flex; flex: 1; overflow: hidden;
-        }
-        @media (max-width: 900px) {
-            .viewer-content { flex-direction: column; }
+            display: grid; grid-template-columns: 1.8fr 1fr; flex: 1; overflow: hidden;
         }
 
-        /* مشغل الفيديو */
+        /* حاوية مشغل الفيديو المستجيبة */
         .video-section {
-            flex: 2; background: #000; position: relative; display: flex; flex-direction: column;
+            background: #0b0c0d; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; position: relative; padding: 2rem; overflow-y: auto;
         }
-        .video-wrapper {
-            position: relative; width: 100%; padding-bottom: 56.25%; /* 16:9 */ flex: 1;
+        .video-player-container {
+            width: 100%; max-width: 1000px; margin: auto; position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4); border-radius: 12px; overflow: hidden;
+            aspect-ratio: 16 / 9; background: #000;
         }
-        .video-wrapper iframe {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        .video-player-container iframe {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; z-index: 1;
         }
 
-        /* زر ملء الشاشة المخصص */
+        /* زر ملء الشاشة المخصص لحاوية الحماية */
         .fullscreen-btn {
-            position: absolute; bottom: 15px; right: 15px; z-index: 20;
-            background: rgba(0,0,0,0.6); color: white; border: none; padding: 10px;
-            border-radius: 5px; cursor: pointer; font-size: 1.2rem; transition: var(--transition);
+            position: absolute; bottom: 15px; left: 15px; z-index: 20;
+            background: rgba(26, 79, 59, 0.85); color: white; border: none; width: 42px; height: 42px;
+            border-radius: 8px; cursor: pointer; font-size: 1.2rem; transition: var(--transition);
+            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
         }
-        .fullscreen-btn:hover { background: var(--primary-color); }
+        .fullscreen-btn:hover { background: var(--primary-color); transform: scale(1.05); }
 
-        /* طبقات حماية اليوتيوب */
+        /* طبقات حماية روابط وميزات اليوتيوب - ممررة للأحداث بشكل مرن لعدم تعطيل أزرار التشغيل */
         .yt-protection-top, .yt-protection-bottom, .yt-protection-center {
-            position: absolute; left: 0; right: 0; z-index: 10;
+            position: absolute; left: 0; right: 0; z-index: 10; pointer-events: none;
         }
-        .yt-protection-top { top: 0; height: 60px; }
-        .yt-protection-bottom { bottom: 0; height: 60px; }
-        .yt-protection-center { top: 50%; transform: translateY(-50%); height: 60px; }
+        .yt-protection-top { top: 0; height: 55px; }
+        .yt-protection-bottom { bottom: 0; height: 50px; }
 
-        /* قائمة الدروس والملحقات */
+        /* شريط الدروس والملحقات */
         .playlist-section {
-            flex: 1; background: var(--white); border-right: 1px solid #eee;
-            overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;
+            background: var(--white); border-right: 1px solid rgba(0,0,0,0.06);
+            overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem;
         }
         
-        .playlist-title { color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 0.5rem; margin-bottom: 1rem;}
+        .playlist-title { color: var(--primary-color); border-bottom: 2px solid #f5f0e6; padding-bottom: 0.6rem; font-weight: 800; font-size: 1.15rem;}
         
         .lesson-item {
-            padding: 1rem; background: #f9f9f9; border-radius: 8px; margin-bottom: 0.5rem;
-            cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 10px;
-            border: 1px solid transparent;
+            padding: 1.1rem 1rem; background: #fcfcfc; border-radius: 10px; margin-bottom: 0.6rem;
+            cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 12px;
+            border: 1px solid #eee;
         }
-        .lesson-item:hover { background: #f0f0f0; }
-        .lesson-item.active { background: rgba(26, 79, 59, 0.1); border-color: var(--primary-color); font-weight: bold; }
+        .lesson-item:hover { background: #f5f5f5; transform: translateX(-3px); }
+        .lesson-item.active { background: rgba(26, 79, 59, 0.08); border-color: var(--primary-color); color: var(--primary-color); font-weight: 700; }
+        .lesson-item i { font-size: 1.2rem; color: var(--accent-color); }
+        .lesson-item.active i { color: var(--primary-color); }
         
-        .files-list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .files-list { display: flex; flex-direction: column; gap: 10px; }
         .file-link {
-            background: #f0f0f0; color: var(--text-dark); text-decoration: none;
-            padding: 8px 15px; border-radius: 5px; font-size: 0.9rem; transition: var(--transition);
-            display: flex; align-items: center; gap: 5px;
+            background: #f7f6f3; color: var(--text-dark); text-decoration: none;
+            padding: 10px 15px; border-radius: 8px; font-size: 0.95rem; transition: var(--transition);
+            display: flex; align-items: center; gap: 8px; border: 1px solid rgba(0,0,0,0.03); font-weight: 500;
         }
-        .file-link:hover { background: var(--primary-color); color: var(--white); }
+        .file-link:hover { background: var(--primary-color); color: var(--white); transform: translateX(-3px); }
+        .file-link i { color: var(--accent-color); }
+        .file-link:hover i { color: var(--white); }
+
+        /* شاشات الاستجابة للأجهزة اللوحية والهواتف */
+        @media (max-width: 992px) {
+            .viewer-content { grid-template-columns: 1fr; }
+            .video-section { padding: 1rem; }
+            .playlist-section { overflow-y: visible; padding: 1.5rem; }
+        }
 
         /* النوافذ المنبثقة العامة */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.55); backdrop-filter: blur(5px);
             display: flex; align-items: center; justify-content: center; z-index: 2000;
             opacity: 0; visibility: hidden; transition: var(--transition);
         }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-content {
-            background: var(--white); border-radius: 20px; padding: 2.5rem; width: 90%; max-width: 400px;
-            position: relative; transform: scale(0.8); transition: var(--transition);
+            background: var(--white); border-radius: 20px; padding: 2.5rem; width: 90%; max-width: 440px;
+            position: relative; transform: scale(0.8); transition: var(--transition); box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
-        .modal-overlay.active .modal-content { animation: jelly 0.6s ease forwards; }
+        .modal-overlay.active .modal-content { animation: jelly 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
         @keyframes jelly {
-            0% { transform: scale(0.8); } 30% { transform: scale(1.05); }
-            50% { transform: scale(0.95); } 70% { transform: scale(1.02); } 100% { transform: scale(1); }
+            0% { transform: scale(0.8); } 40% { transform: scale(1.04); }
+            70% { transform: scale(0.98); } 100% { transform: scale(1); }
         }
 
-        .close-modal { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; color: #999; cursor: pointer; }
-        .modal-title { color: var(--primary-color); margin-bottom: 1rem; text-align: center; }
+        .close-modal { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; color: #aaa; cursor: pointer; transition: var(--transition); }
+        .close-modal:hover { color: var(--danger); }
+        .modal-title { color: var(--primary-color); margin-bottom: 1.2rem; text-align: center; font-weight: 800; }
         
-        /* تعليمات الدفع */
         .payment-instructions {
-            background: rgba(154, 123, 79, 0.1); border: 1px dashed var(--accent-color);
-            padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; font-size: 0.95rem;
+            background: rgba(154, 123, 79, 0.08); border: 1px dashed var(--accent-color);
+            padding: 1.2rem; border-radius: 10px; margin-bottom: 1.5rem; text-align: center; font-size: 0.95rem; line-height: 1.5;
         }
-        .payment-instructions strong { color: var(--primary-color); font-size: 1.2rem; display: block; margin-top: 5px;}
+        .payment-instructions strong { color: var(--primary-color); font-size: 1.3rem; display: block; margin-top: 6px; letter-spacing: 1px;}
 
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-        .form-group input { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px; outline: none; }
-        .form-group input:focus { border-color: var(--accent-color); }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.95rem; color: var(--primary-color); }
+        .form-group input { width: 100%; padding: 0.85rem; border: 1px solid #ddd; border-radius: 10px; outline: none; transition: var(--transition); font-weight: 500; }
+        .form-group input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(154, 123, 79, 0.15); }
+        
         .btn-submit {
             width: 100%; padding: 1rem; background: var(--primary-color); color: var(--white);
-            border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 1rem;
+            border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 1rem; transition: var(--transition);
         }
+        .btn-submit:hover { background: var(--primary-hover); }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
 
+        /* شاشة التحميل اللطيفة */
         .page-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s;
+            background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.4s;
         }
         .spinner {
-            width: 50px; height: 50px; border: 5px solid rgba(26, 79, 59, 0.2);
-            border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite;
+            width: 55px; height: 55px; border: 5px solid rgba(26, 79, 59, 0.15);
+            border-top-color: var(--primary-color); border-radius: 50%; animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         .prevent-select { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
 
-        /* نظام الإشعارات الحديث المطور (Toasts) */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        /* نظام توست الإشعارات الجانبية المتطور */
+        .toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; }
         .custom-toast {
-            background: var(--white);
-            color: var(--text-dark);
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            min-width: 300px;
-            border-right: 5px solid var(--primary-color);
-            transform: translateX(-130%);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            background: var(--white); color: var(--text-dark); padding: 1.1rem 1.6rem; border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 14px;
+            font-weight: 700; min-width: 320px; border-right: 6px solid var(--primary-color);
+            transform: translateX(-140%); transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
         }
         .custom-toast.show { transform: translateX(0); }
         .custom-toast.success { border-right-color: #28a745; }
-        .custom-toast.error { border-right-color: #dc3545; }
+        .custom-toast.error { border-right-color: var(--danger); }
         .custom-toast.info { border-right-color: var(--accent-color); }
-        .custom-toast i { font-size: 1.4rem; }
+        .custom-toast i { font-size: 1.5rem; }
         .custom-toast.success i { color: #28a745; }
-        .custom-toast.error i { color: #dc3545; }
+        .custom-toast.error i { color: var(--danger); }
         .custom-toast.info i { color: var(--accent-color); }
     </style>
 </head>
@@ -279,6 +339,22 @@
     <nav class="navbar">
         <div class="brand">Mixtaja</div>
         <div class="nav-tools">
+            <div class="notif-container">
+                <button class="notif-bell-btn" id="notif-bell" onclick="toggleNotifDropdown()">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="notif-badge" id="notif-count" style="display: none;">0</span>
+                </button>
+                <div class="notif-dropdown" id="notif-dropdown">
+                    <div class="notif-header">
+                        <h4>الإشعارات</h4>
+                        <button class="btn-clear-notif" onclick="markAllNotificationsAsRead()">تحديد كالمقروء</button>
+                    </div>
+                    <div class="notif-body" id="notif-items-wrapper">
+                        <div class="notif-empty">لا توجد إشعارات حالياً</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="coins-badge">
                 <span>كاشات mix</span>
                 <span class="coins-amount" id="user-coins">0</span>
@@ -290,8 +366,7 @@
 
     <main class="container">
         <h2 class="section-title">الكورسات المتاحة</h2>
-        <div class="courses-grid" id="courses-container">
-            </div>
+        <div class="courses-grid" id="courses-container"></div>
     </main>
 
     <div class="course-viewer-modal" id="courseViewer">
@@ -300,28 +375,25 @@
             <button class="btn-close-viewer" onclick="closeCourseViewer()"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="viewer-content">
-            <div class="video-section" id="fullscreen-container">
-                <div class="video-wrapper">
+            <div class="video-section">
+                <div class="video-player-container" id="fullscreen-container">
                     <div class="yt-protection-top"></div>
-                    <div class="yt-protection-center"></div>
                     <div class="yt-protection-bottom"></div>
                     
-                    <iframe id="lesson-player" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <iframe id="lesson-player" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <button class="fullscreen-btn" onclick="toggleFullScreen()"><i class="fa-solid fa-expand"></i></button>
                 </div>
-                <button class="fullscreen-btn" onclick="toggleFullScreen()"><i class="fa-solid fa-expand"></i></button>
             </div>
             
             <div class="playlist-section">
                 <div>
                     <h3 class="playlist-title">محتوى الكورس (الدروس)</h3>
-                    <div id="playlist-container">
-                        </div>
+                    <div id="playlist-container"></div>
                 </div>
                 
-                <div style="margin-top: 2rem;">
+                <div>
                     <h3 class="playlist-title">ملحقات الكورس</h3>
-                    <div class="files-list" id="files-container">
-                        </div>
+                    <div class="files-list" id="files-container"></div>
                 </div>
             </div>
         </div>
@@ -357,16 +429,30 @@
     </div>
 
     <script>
+        // فتح وإغلاق النوافذ المنبثقة العامة
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { 
             document.getElementById(id).classList.remove('active'); 
             if(id === 'topupModal') document.getElementById('topup-form').reset();
         }
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal-overlay')) event.target.classList.remove('active');
+        
+        // فتح وإغلاق قائمة الإشعارات المنسدلة
+        function toggleNotifDropdown() {
+            const dropdown = document.getElementById('notif-dropdown');
+            dropdown.classList.toggle('active');
+            if(dropdown.classList.contains('active')) {
+                document.getElementById('notif-bell').classList.remove('shake');
+            }
         }
 
-        // كود ملء الشاشة المخصص لحاوية الفيديو
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) event.target.classList.remove('active');
+            if (!event.target.closest('.notif-container')) {
+                document.getElementById('notif-dropdown').classList.remove('active');
+            }
+        }
+
+        // كود ملء الشاشة المتطور والمستجيب لحاوية الفيديو بالكامل
         function toggleFullScreen() {
             const container = document.getElementById("fullscreen-container");
             const icon = document.querySelector('.fullscreen-btn i');
@@ -386,7 +472,7 @@
             }
         }
 
-        // دالة إنشاء وإظهار الإشعارات المخصصة بشكل مميز بديلة الـ alert
+        // نظام التوستات الجانبية المطورة
         window.showToast = (message, type = 'success') => {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -406,15 +492,15 @@
             
             setTimeout(() => {
                 toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 400);
-            }, 4000);
+                setTimeout(() => toast.remove(), 450);
+            }, 4500);
         };
     </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, setDoc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, collection, onSnapshot, setDoc, updateDoc, arrayUnion, increment, query, orderBy, getDocs, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCv0C8nEmkov22ZM1vVtgbagQnMnQbvB24",
@@ -432,14 +518,29 @@
         let currentUser = null;
         let userMixCash = 0;
         let unlockedCourses = [];
-        let allLiveCourses = []; // لتخزين الكورسات الحقيقية القادمة من قاعدة البيانات
+        let allLiveCourses = [];
+        let currentLoadedNotifications = [];
 
-        // 1. مراقبة حالة تسجيل دخول الطالب ومزامنة بيانات حسابه ورصيده
+        // 1. طلب إذن إشعارات جوجل من المتصفح عند بدء التشغيل والاتصال
+        function requestSystemNotificationPermission() {
+            if ("Notification" in window) {
+                if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            window.showToast("تم تفعيل إشعارات النظام بنجاح لتلقي تحديثات الأدمن الفورية! 🔔", "success");
+                        }
+                    });
+                }
+            }
+        }
+
+        // مراقبة حالة تسجيل الدخول وبناء بيانات المستخدم والاتصال بالخادم
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
             } else {
                 currentUser = user;
+                requestSystemNotificationPermission();
                 
                 const userRef = doc(db, "users", user.uid);
                 onSnapshot(userRef, (docSnap) => {
@@ -458,12 +559,12 @@
                     }
                 });
 
-                // تفعيل الاستماع اللحظي للكورسات المرفوعة بواسطة الأدمن
                 listenToCoursesLive();
+                listenToNotificationsLive();
             }
         });
 
-        // 2. جلب وتحديث قائمة الكورسات بالوقت الفعلي من الـ Firestore
+        // 2. جلب قائمة الكورسات المتاحة بالوقت الفعلي من الـ Firestore
         function listenToCoursesLive() {
             onSnapshot(collection(db, "courses"), (snapshot) => {
                 allLiveCourses = [];
@@ -476,7 +577,97 @@
             });
         }
 
-        // 3. رسم وبناء بطاقات الكورسات الحية ديناميكياً داخل الواجهة
+        // 3. نظام مراقبة والاستماع للإشعارات الحية الخاصة بالطالب تلقائياً
+        function listenToNotificationsLive() {
+            const notifRef = collection(db, "users", currentUser.uid, "notifications");
+            const q = query(notifRef, orderBy("timestamp", "desc"));
+            
+            let isFirstLoad = true;
+            
+            onSnapshot(q, (snapshot) => {
+                let unreadCount = 0;
+                const wrapper = document.getElementById('notif-items-wrapper');
+                wrapper.innerHTML = '';
+                currentLoadedNotifications = [];
+
+                if (snapshot.empty) {
+                    wrapper.innerHTML = '<div class="notif-empty">لا توجد إشعارات حالياً</div>';
+                    document.getElementById('notif-count').style.display = 'none';
+                    return;
+                }
+
+                snapshot.forEach((docNotif) => {
+                    const notif = docNotif.data();
+                    notif.id = docNotif.id;
+                    currentLoadedNotifications.push(notif);
+
+                    if (!notif.read) {
+                        unreadCount++;
+                    }
+
+                    // تصميم أيقونات مخصصة حسب نوع الإشعار المستلم
+                    let icon = '<i class="fa-solid fa-bell" style="color: var(--accent-color)"></i>';
+                    if(notif.type === 'charge') icon = '<i class="fa-solid fa-wallet" style="color: #28a745"></i>';
+                    if(notif.type === 'buy') icon = '<i class="fa-solid fa-graduation-cap" style="color: var(--primary-color)"></i>';
+
+                    const itemHTML = `
+                        <div class="notif-item ${!notif.read ? 'unread' : ''}">
+                            ${icon}
+                            <div class="notif-item-text">
+                                <span class="notif-msg">${notif.message}</span>
+                                <span class="notif-time">${formatDate(notif.timestamp)}</span>
+                            </div>
+                        </div>
+                    `;
+                    wrapper.innerHTML += itemHTML;
+                });
+
+                // تحديث الشارة وجرس التنبيه
+                const badge = document.getElementById('notif-count');
+                if (unreadCount > 0) {
+                    badge.innerText = unreadCount;
+                    badge.style.display = 'flex';
+                    if (!isFirstLoad) {
+                        document.getElementById('notif-bell').classList.add('shake');
+                        
+                        // إرسال إشعار نظام رسمي فوري عبر ميزات Google للمتصفح
+                        const latestNotif = currentLoadedNotifications[0];
+                        if (Notification.permission === "granted") {
+                            new Notification("منصة Mixtaja", {
+                                body: latestNotif.message,
+                                icon: 'logo1.png',
+                                dir: 'rtl'
+                            });
+                        }
+                        window.showToast(latestNotif.message, "info");
+                    }
+                } else {
+                    badge.style.display = 'none';
+                    document.getElementById('notif-bell').classList.remove('shake');
+                }
+
+                isFirstLoad = false;
+            });
+        }
+
+        // تحديث حالة جميع الإشعارات غير المقروءة إلى مقروءة عند الضغط على الزر
+        window.markAllNotificationsAsRead = async () => {
+            for (let notif of currentLoadedNotifications) {
+                if (!notif.read) {
+                    const docRef = doc(db, "users", currentUser.uid, "notifications", notif.id);
+                    await updateDoc(docRef, { read: true });
+                }
+            }
+        };
+
+        // دالة مساعدة لتنسيق وعرض التوقيت الزمني للإشعار بشكل مقروء ومبسط
+        function formatDate(timestamp) {
+            if (!timestamp) return 'الآن';
+            const date = timestamp.toDate();
+            return date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) + ' - ' + date.toLocaleDateString('ar-EG');
+        }
+
+        // 4. بناء وعرض بطاقات الكورسات الحية ديناميكياً داخل الواجهة
         function renderCourses() {
             const container = document.getElementById('courses-container');
             container.innerHTML = '';
@@ -493,15 +684,15 @@
                 let lockOverlay = '';
 
                 if (isUnlocked) {
-                    actionButton = `<button class="btn-action btn-open" onclick="window.openCourse('${course.id}')">فتح الكورس واالمشاهدة</button>`;
+                    actionButton = `<button class="btn-action btn-open" onclick="window.openCourse('${course.id}')"><i class="fa-solid fa-circle-play"></i> فتح الكورس والمشاهدة</button>`;
                 } else {
                     lockOverlay = `
                         <div class="locked-overlay">
                             <i class="fa-solid fa-lock"></i>
-                            <span>مقفول</span>
+                            <span>محتوى مقفل</span>
                         </div>
                     `;
-                    actionButton = `<button class="btn-action btn-buy" onclick="window.buyCourse('${course.id}', ${course.price})">شراء بـ ${course.price} كاش mix</button>`;
+                    actionButton = `<button class="btn-action btn-buy" onclick="window.buyCourse('${course.id}', ${course.price})"><i class="fa-solid fa-cart-shopping"></i> شراء بـ ${course.price} كاش mix</button>`;
                 }
 
                 const cardHTML = `
@@ -522,7 +713,7 @@
             });
         }
 
-        // 4. دالة شراء الكورس وخصم الكاشات بنظام الإشعارات المطور
+        // 5. شراء الكورس المختار واقتطاع رصيد الكاشات مع إضافة إشعار محلي فوري
         window.buyCourse = async (courseId, price) => {
             if (userMixCash >= price) {
                 const confirmBuy = confirm(`هل أنت متأكد من رغبتك في شراء هذا الكورس واقتطاع ${price} كاش من رصيدك؟`);
@@ -533,6 +724,17 @@
                             mixCash: increment(-price),
                             unlockedCourses: arrayUnion(courseId)
                         });
+
+                        // تسجيل تفاصيل الفاتورة في إشعارات المستخدم كتوثيق رسمي محمي له
+                        const notifRef = collection(db, "users", currentUser.uid, "notifications");
+                        const course = allLiveCourses.find(c => c.id === courseId);
+                        await setDoc(doc(notifRef), {
+                            message: `🎉 تم الاشتراك بنجاح في كورس: (${course.title}) واقتطاع ${price} كاش من رصيدك.`,
+                            timestamp: new Date(),
+                            read: false,
+                            type: 'buy'
+                        });
+
                         window.showToast("تهانينا! تم شراء الكورس بنجاح وتفعيل المحتوى. 🎉", "success");
                     } catch (error) {
                         console.error("Error buying course:", error);
@@ -544,14 +746,13 @@
             }
         };
 
-        // 5. فتح واجهة عرض محتويات الكورس المشترى
+        // 6. تشغيل الكورس المفتوح وتجهيز البلاي ليست والملخصات
         window.openCourse = (courseId) => {
             const course = allLiveCourses.find(c => c.id === courseId);
             if(!course) return;
 
             document.getElementById('viewer-title').innerText = course.title;
             
-            // توليد قائمة الدروس المرفوعة من الأدمن
             const playlistContainer = document.getElementById('playlist-container');
             playlistContainer.innerHTML = '';
             
@@ -569,7 +770,6 @@
                 playlistContainer.innerHTML = '<span style="color:#999; font-size:0.9rem;">لا توجد دروس مرفوعة في هذا الكورس بعد.</span>';
             }
 
-            // توليد الملفات والملحقات والكتب إن وجدت
             const filesContainer = document.getElementById('files-container');
             filesContainer.innerHTML = '';
             if(course.files && course.files.length > 0){
@@ -584,7 +784,6 @@
                 filesContainer.innerHTML = '<span style="color:#999; font-size:0.9rem;">لا توجد ملفات أو ملخصات ملحقة حالياً.</span>';
             }
 
-            // تشغيل أول فيديو تلقائياً عند فتح الكورس
             if(course.lessons && course.lessons.length > 0){
                 setIframeSource(course.lessons[0].videoId);
             } else {
@@ -595,7 +794,6 @@
             document.body.style.overflow = 'hidden';
         };
 
-        // تشغيل فيديو الدرس المحدد ومزامنة التنشيط
         window.playLesson = (videoId, element) => {
             document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
@@ -604,7 +802,8 @@
 
         function setIframeSource(videoId) {
             const iframe = document.getElementById('lesson-player');
-            iframe.src = `https://www.youtube.com/embed/${videoId}?controls=0&modestbranding=1&rel=0&disablekb=1`;
+            // تم تحسين معاملات اليوتيوب لضمان استجابة وعمل عناصر التحكم بسلاسة مع طبقات الأمان
+            iframe.src = `https://www.youtube.com/embed/${videoId}?controls=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3`;
         }
 
         window.closeCourseViewer = () => {
@@ -617,7 +816,7 @@
             signOut(auth).then(() => window.location.href = 'index.html');
         };
 
-        // 6. معالجة إرسال طلب الشحن المالي وإعلام المستخدم عبر الـ Toast
+        // 7. معالجة وإرسال طلب الشحن المالي تليجرام للأدمن
         document.getElementById('topup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit-topup');
@@ -630,7 +829,7 @@
             const botToken = "8635550416:AAGsNM7mnjak80kQclTHdMJYKKvaiAJHNjI";
             const chatId = "5394550159";
 
-            const caption = `🔥 طلب شحن جديد!\n\n👤 المستخدم: ${currentUser.email}\n💰 المبلغ المطلوب: ${amount} كاش mix\n📱 رقم التحويل: ${phone}`;
+            const caption = `🔥 طلب شحن جديد!\n\n👤 كود المستخدم (UID): ${currentUser.uid}\n📧 حساب الطالب: ${currentUser.email}\n💰 المبلغ المطلوب: ${amount} كاش mix\n📱 رقم التحويل: ${phone}`;
 
             const formData = new FormData();
             formData.append('chat_id', chatId);
