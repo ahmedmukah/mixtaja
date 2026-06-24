@@ -8,7 +8,7 @@
     
     <meta name="robots" content="noindex, nofollow, noarchive">
     
-    <title>Mixtaja - لوحة الإدارة</title>
+    <title>Mixtaja - لوحة الإدارة والإشعارات</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,6 +27,7 @@
             --transition: all 0.3s ease;
             --danger: #dc3545;
             --success: #28a745;
+            --info: #17a2b8;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
@@ -49,7 +50,7 @@
         /* حاوية التبويبات */
         .tabs-container {
             display: flex; background: var(--white); box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            justify-content: center; gap: 2rem; padding: 0.5rem 0;
+            justify-content: center; gap: 1.5rem; padding: 0.5rem 0; flex-wrap: wrap;
         }
         .tab-btn {
             background: none; border: none; padding: 0.8rem 1.5rem; font-size: 1.1rem; font-weight: 700;
@@ -77,20 +78,36 @@
 
         /* جداول وقوائم البيانات */
         .data-card {
-            background: var(--white); border-radius: 12px; box-shadow: var(--shadow); padding: 1.5rem; overflow-x: auto;
+            background: var(--white); border-radius: 12px; box-shadow: var(--shadow); padding: 1.5rem; overflow-x: auto; margin-bottom: 1.5rem;
         }
         table { width: 100%; border-collapse: collapse; text-align: right; }
-        th, td { padding: 1rem; border-bottom: 1px solid #eee; }
+        th, td { padding: 1rem; border-bottom: 1px solid #eee; vertical-align: middle; }
         th { color: var(--primary-color); font-weight: 700; background: #f8f9fa; }
 
-        /* التحكم في الكاشات */
-        .cash-control { display: flex; align-items: center; gap: 5px; }
+        /* التحكم في الكاشات والمراسلة */
+        .cash-control { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
         .cash-input { width: 70px; padding: 0.4rem; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
-        .btn-cash { border: none; padding: 0.4rem 0.8rem; border-radius: 4px; color: white; cursor: pointer; font-weight: bold; }
+        .btn-cash { border: none; padding: 0.4rem 0.8rem; border-radius: 4px; color: white; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 3px; }
         .btn-cash.add { background: var(--success); }
         .btn-cash.sub { background: var(--danger); }
+        .btn-cash.msg { background: var(--info); }
 
-        /* بطاقات الكورسات في لوحة الأدمن */
+        /* توزيع نظام الشبكة للإشعارات */
+        .notif-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 850px) { .notif-grid { grid-template-columns: 1fr; } }
+
+        /* قائمة الإشعارات المرسلة */
+        .notif-list-container { max-height: 480px; overflow-y: auto; padding-left: 5px; }
+        .notif-item { border: 1px solid #eee; border-radius: 8px; padding: 1rem; margin-bottom: 0.8rem; background: #fafafa; position: relative; }
+        .notif-item-title { font-weight: bold; color: var(--primary-color); font-size: 1.05rem; margin-bottom: 0.3rem; padding-left: 30px; }
+        .notif-item-body { font-size: 0.95rem; color: #555; line-height: 1.4; margin-bottom: 0.5rem; }
+        .notif-item-meta { font-size: 0.8rem; color: #999; display: flex; justify-content: space-between; align-items: center; }
+        .badge { padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; }
+        .badge.all { background: var(--primary-color); }
+        .badge.specific { background: var(--accent-color); }
+        .btn-delete-notif { position: absolute; top: 12px; left: 12px; background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1rem; }
+
+        /* بطاقات الكورسات */
         .admin-courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
         .admin-course-card {
             background: var(--white); border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow);
@@ -100,9 +117,7 @@
         .admin-course-price { color: var(--accent-color); font-weight: bold; margin-bottom: 1rem; }
         .admin-course-meta { font-size: 0.9rem; color: #666; margin-bottom: 1rem; }
         .admin-course-actions { display: flex; gap: 10px; margin-top: auto; }
-        .btn-action {
-            flex: 1; padding: 0.5rem; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: var(--transition);
-        }
+        .btn-action { flex: 1; padding: 0.5rem; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: var(--transition); }
         .btn-edit { background: #e0a800; color: #fff; }
         .btn-delete { background: var(--danger); color: #fff; }
 
@@ -120,11 +135,11 @@
         }
         .close-modal { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; color: #999; cursor: pointer; }
         
-        /* فورم الكورس */
+        /* عناصر الإدخال الموحدة */
         .form-group { margin-bottom: 1.2rem; }
         .form-group label { display: block; margin-bottom: 0.4rem; font-weight: bold; color: var(--primary-color); }
-        .form-group input { width: 100%; padding: 0.7rem; border: 1px solid #ddd; border-radius: 6px; outline: none; }
-        .form-group input:focus { border-color: var(--accent-color); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.7rem; border: 1px solid #ddd; border-radius: 6px; outline: none; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent-color); }
         
         .sub-section { border: 1px solid #eee; padding: 1rem; border-radius: 8px; background: #fafafa; margin-bottom: 1rem; }
         .sub-section-title { font-size: 1rem; color: var(--accent-color); margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
@@ -139,7 +154,7 @@
             border: none; border-radius: 6px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 1rem;
         }
 
-        /* شاشة التحميل الحامية */
+        /* شاشة التحميل */
         .page-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center;
@@ -158,12 +173,14 @@
     </nav>
 
     <div class="tabs-container">
-        <button class="tab-btn active" onclick="window.switchTab('users-section', this)"><i class="fa-solid fa-users"></i> إدارة المشتركين</button>
-        <button class="tab-btn" onclick="window.switchTab('courses-section', this)"><i class="fa-solid fa-graduation-cap"></i> إدارة الكورسات</button>
+        <button id="btn-tab-users" class="tab-btn active" onclick="window.switchTab('users-section', this)"><i class="fa-solid fa-users"></i> إدارة المشتركين</button>
+        <button id="btn-tab-courses" class="tab-btn" onclick="window.switchTab('courses-section', this)"><i class="fa-solid fa-graduation-cap"></i> إدارة الكورسات</button>
+        <button id="btn-tab-notifications" class="tab-btn" onclick="window.switchTab('notifications-section', this)"><i class="fa-solid fa-bell"></i> إدارة التحكم بالإشعارات</button>
     </div>
 
     <main class="main-content">
 
+        <!-- قسم إدارة المشتركين -->
         <section id="users-section" class="panel-section active">
             <div class="section-header">
                 <h2 class="section-title">قائمة الطلاب والمشتركين المسجلين</h2>
@@ -172,10 +189,11 @@
                 <table>
                     <thead>
                         <tr>
+                            <th>معرف الحساب (User ID)</th>
                             <th>الاسم الكامل</th>
                             <th>البريد الإلكتروني</th>
                             <th>رصيد كاشات mix الحالي</th>
-                            <th>تعديل الرصيد (إضافة / سحب)</th>
+                            <th>التحكم في الحساب والتعديل</th>
                         </tr>
                     </thead>
                     <tbody id="users-table-body">
@@ -184,6 +202,7 @@
             </div>
         </section>
 
+        <!-- قسم إدارة الكورسات -->
         <section id="courses-section" class="panel-section">
             <div class="section-header">
                 <h2 class="section-title">الكورسات المرفوعة على المنصة</h2>
@@ -193,8 +212,57 @@
             </div>
         </section>
 
+        <!-- قسم إدارة التحكم بالإشعارات الجديد -->
+        <section id="notifications-section" class="panel-section">
+            <div class="section-header">
+                <h2 class="section-title">إرسال وتوجيه الإشعارات العامة والخاصة</h2>
+            </div>
+            
+            <div class="notif-grid">
+                <!-- لوحة الإرسال -->
+                <div class="data-card">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1.2rem;"><i class="fa-solid fa-paper-plane"></i> إنشاء وإرسال رسالة</h3>
+                    
+                    <form id="notification-form">
+                        <div class="form-group">
+                            <label>نوع الإشعار المستهدف</label>
+                            <select id="notif-target" onchange="window.toggleTargetFields()" required>
+                                <option value="all">إرسال رسالة موحدة للجميع (عام)</option>
+                                <option value="specific">إرسال وتوجيه لحساب معين (خاص)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="target-user-input-group" style="display: none;">
+                            <label>معرف حساب الطالب المستهدف (User ID)</label>
+                            <input type="text" id="notif-user-id" placeholder="أدخل كود الـ ID الخاص بالطالب هنا">
+                        </div>
+
+                        <div class="form-group">
+                            <label>عنوان الإشعار</label>
+                            <input type="text" id="notif-title" required placeholder="مثال: تنبيه هام بخصوص الحصص">
+                        </div>
+
+                        <div class="form-group">
+                            <label>محتوى الرسالة بالكامل</label>
+                            <textarea id="notif-body" rows="4" required placeholder="اكتب نص إشعارك هنا والذي سيظهر للطالب داخل تطبيقه أو موقعه..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit" id="btn-send-notif"><i class="fa-solid fa-share-from-square"></i> بث وبث الإشعار فوراً</button>
+                    </form>
+                </div>
+
+                <!-- سجل الإشعارات الصادرة -->
+                <div class="data-card">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1.2rem;"><i class="fa-solid fa-clock-rotate-left"></i> سجل الإشعارات الصادرة مؤخراً</h3>
+                    <div class="notif-list-container" id="notifications-list-container">
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
+    <!-- مودال إضافة/تعديل كورس -->
     <div class="modal-overlay" id="courseModal">
         <div class="modal-content">
             <button class="close-modal" onclick="window.closeCourseModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -239,7 +307,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, increment, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCv0C8nEmkov22ZM1vVtgbagQnMnQbvB24",
@@ -256,7 +324,7 @@
 
         let allLiveCourses = [];
 
-        // تنظيف النطاقات وتصدير الدوال لواجهة الـ HTML بشكل آمن تماماً
+        // الحماية وتصدير الدوال للنطاق العام لتعمل الأزرار بسلاسة
         window.switchTab = (sectionId, element) => {
             document.querySelectorAll('.panel-section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -303,6 +371,29 @@
             container.appendChild(row);
         };
 
+        // التبديل الديناميكي لحقول الإشعارات
+        window.toggleTargetFields = () => {
+            const target = document.getElementById('notif-target').value;
+            const inputGroup = document.getElementById('target-user-input-group');
+            if (target === 'specific') {
+                inputGroup.style.display = 'block';
+                document.getElementById('notif-user-id').setAttribute('required', 'true');
+            } else {
+                inputGroup.style.display = 'none';
+                document.getElementById('notif-user-id').removeAttribute('required');
+            }
+        };
+
+        // دالة المراسلة السريعة من جدول المستخدمين
+        window.quickMessage = (userId) => {
+            const tabBtn = document.getElementById('btn-tab-notifications');
+            window.switchTab('notifications-section', tabBtn);
+            document.getElementById('notif-target').value = 'specific';
+            window.toggleTargetFields();
+            document.getElementById('notif-user-id').value = userId;
+            document.getElementById('notif-title').focus();
+        };
+
         // 1. التحقق الصارم والأمان التام من هوية المسؤول الأدمن
         onAuthStateChanged(auth, (user) => {
             if (!user || user.email !== '0@gmail.com') {
@@ -312,6 +403,7 @@
                 document.getElementById('page-loader').style.display = 'none';
                 listenToUsers();
                 listenToCourses();
+                listenToNotifications();
             }
         });
 
@@ -320,7 +412,7 @@
             signOut(auth).then(() => window.location.href = 'index.html');
         };
 
-        // 2. مراقبة وجلب كل المستخدمين المسجلين في النظام بالوقت الفعلي (Real-time)
+        // 2. مراقبة وجلب كل المستخدمين المسجلين في النظام بالوقت الفعلي
         function listenToUsers() {
             onSnapshot(collection(db, "users"), (snapshot) => {
                 const tbody = document.getElementById('users-table-body');
@@ -332,6 +424,7 @@
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
+                        <td><small style="color:#666; font-family:monospace; background:#eee; padding:3px 6px; border-radius:4px;">${userDoc.id}</small></td>
                         <td><strong>${userData.fullName || 'بدون اسم'}</strong></td>
                         <td>${userData.email}</td>
                         <td><span style="color:var(--accent-color); font-weight:bold;">${userData.mixCash || 0}</span> كاش</td>
@@ -340,6 +433,7 @@
                                 <input type="number" class="cash-input" id="amount-${userDoc.id}" placeholder="المبلغ" min="1">
                                 <button class="btn-cash add" onclick="window.modifyCash('${userDoc.id}', true)"><i class="fa-solid fa-plus"></i> إضافة</button>
                                 <button class="btn-cash sub" onclick="window.modifyCash('${userDoc.id}', false)"><i class="fa-solid fa-minus"></i> سحب</button>
+                                <button class="btn-cash msg" onclick="window.quickMessage('${userDoc.id}')" title="إرسال رسالة خاصة"><i class="fa-solid fa-envelope"></i> رسالة</button>
                             </div>
                         </td>
                     `;
@@ -362,9 +456,7 @@
             const userRef = doc(db, "users", userId);
 
             try {
-                await updateDoc(userRef, {
-                    mixCash: increment(change)
-                });
+                await updateDoc(userRef, { mixCash: increment(change) });
                 input.value = '';
             } catch (error) {
                 console.error("Error adjusting cash:", error);
@@ -408,10 +500,9 @@
             });
         }
 
-        // 4. معالجة وحفظ الكورس الجديد أو المعدل في الـ Firestore
+        // معالجة وحفظ الكورس الجديد أو المعدل
         document.getElementById('course-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const btnSave = document.getElementById('btn-save-course');
             btnSave.innerText = 'جاري الحفظ والرفع...';
             btnSave.disabled = true;
@@ -424,18 +515,14 @@
             document.querySelectorAll('.lesson-data-row').forEach(row => {
                 const lTitle = row.querySelector('.lesson-title-input').value;
                 const lId = row.querySelector('.lesson-id-input').value;
-                if(lTitle && lId) {
-                    lessons.push({ title: lTitle, videoId: lId });
-                }
+                if(lTitle && lId) lessons.push({ title: lTitle, videoId: lId });
             });
 
             const files = [];
             document.querySelectorAll('.file-data-row').forEach(row => {
                 const fName = row.querySelector('.file-name-input').value;
                 const fLink = row.querySelector('.file-link-input').value;
-                if(fName && fLink) {
-                    files.push({ name: fName, link: fLink });
-                }
+                if(fName && fLink) files.push({ name: fName, link: fLink });
             });
 
             const targetDocRef = courseId ? doc(db, "courses", courseId) : doc(collection(db, "courses"));
@@ -452,7 +539,6 @@
                 window.closeCourseModal();
                 alert("تم حفظ ونشر الكورس على المنصة بنجاح!");
             } catch (error) {
-                console.error("Error saving course:", error);
                 alert("فشل رفع الكورس، تحقق من اتصالك بالإنترنت.");
             }
 
@@ -460,7 +546,6 @@
             btnSave.disabled = false;
         });
 
-        // فتح الكورس للتعديل وجلب بياناته داخل الفورم تلقائياً
         window.prepareEditCourse = (courseId) => {
             const course = allLiveCourses.find(c => c.id === courseId);
             if(!course) return;
@@ -483,7 +568,6 @@
             document.getElementById('courseModal').classList.add('active');
         };
 
-        // دالة حذف الكورس من قاعدة البيانات
         window.deleteCourse = async (courseId) => {
             if(confirm("هل أنت متأكد تماماً من حذف هذا الكورس نهائياً من المنصة؟")) {
                 try {
@@ -491,6 +575,91 @@
                     alert("تم حذف الكورس بنجاح.");
                 } catch (error) {
                     alert("فشل الحذف، يرجى المحاولة لاحقاً.");
+                }
+            }
+        };
+
+        // ==========================================
+        // 4. نظام إدارة التحكم بالإشعارات والرسائل الجديد
+        // ==========================================
+        
+        // إرسال إشعار جديد إلى Firestore
+        document.getElementById('notification-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSend = document.getElementById('btn-send-notif');
+            btnSend.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري بث الإشعار...';
+            btnSend.disabled = true;
+
+            const target = document.getElementById('notif-target').value;
+            const userId = document.getElementById('notif-user-id').value.trim();
+            const title = document.getElementById('notif-title').value.trim();
+            const body = document.getElementById('notif-body').value.trim();
+
+            try {
+                // حفظ الرسالة في مجموعة عامة اسمها notifications
+                // لكي يتمكن تطبيق الطالب من الاستماع إليها بكل سهولة عبر كود بسيط
+                await addDoc(collection(db, "notifications"), {
+                    title: title,
+                    body: body,
+                    target: target, // 'all' أو 'specific'
+                    userId: target === 'specific' ? userId : 'all',
+                    createdAt: new Date() // ترتيب تصاعدي وتنازلي بالتاريخ
+                });
+
+                document.getElementById('notification-form').reset();
+                window.toggleTargetFields();
+                alert("تم إرسال ونشر الإشعار بنجاح إلى النظام المستهدف!");
+            } catch (error) {
+                console.error("Error sending notification:", error);
+                alert("حدث خطأ أثناء إرسال الإشعار، يرجى المحاولة مرة أخرى.");
+            }
+
+            btnSend.innerHTML = '<i class="fa-solid fa-share-from-square"></i> بث وبث الإشعار فوراً';
+            btnSend.disabled = false;
+        });
+
+        // الاستماع الفوري لسجل الإشعارات المرسلة وعرضها
+        function listenToNotifications() {
+            const q = query(collection(db, "notifications"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('notifications-list-container');
+                container.innerHTML = '';
+
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="color:#888; text-align:center; padding: 2rem;">لا توجد إشعارات مرسلة بعد.</p>';
+                    return;
+                }
+
+                snapshot.forEach((notifDoc) => {
+                    const data = notifDoc.data();
+                    const id = notifDoc.id;
+                    const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleString('ar-EG') : 'الآن';
+
+                    const item = document.createElement('div');
+                    item.className = 'notif-item';
+                    item.innerHTML = `
+                        <button class="btn-delete-notif" onclick="window.deleteNotification('${id}')" title="حذف الإشعار والتراجع عنه"><i class="fa-solid fa-trash-can"></i></button>
+                        <div class="notif-item-title">${data.title}</div>
+                        <div class="notif-item-body">${data.body}</div>
+                        <div class="notif-item-meta">
+                            <span><i class="fa-solid fa-calendar-days"></i> ${date}</span>
+                            <span class="badge ${data.target}">
+                                ${data.target === 'all' ? '<i class="fa-solid fa-users"></i> رسالة موحدة' : `<i class="fa-solid fa-user"></i> مخصص لـ: ${data.userId}`}
+                            </span>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            });
+        }
+
+        // دالة التراجع عن إشعار وحذفه نهائياً
+        window.deleteNotification = async (notifId) => {
+            if(confirm("هل أنت متأكد من رغبتك في حذف هذا الإشعار؟ لن يظهر للطلاب بعد ذلك.")) {
+                try {
+                    await deleteDoc(doc(db, "notifications", notifId));
+                } catch (error) {
+                    alert("عفواً، فشل حذف الإشعار.");
                 }
             }
         };
