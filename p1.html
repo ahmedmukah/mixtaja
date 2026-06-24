@@ -6,7 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="theme-color" content="#194a38">
     
-    <!-- منع محركات البحث من أرشفة اللوحة -->
     <meta name="robots" content="noindex, nofollow, noarchive">
     
     <title>Mixtaja - لوحة التحكم التعليمية</title>
@@ -234,12 +233,48 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         .prevent-select { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
+
+        /* نظام الإشعارات الحديث المطور (Toasts) */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .custom-toast {
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            min-width: 300px;
+            border-right: 5px solid var(--primary-color);
+            transform: translateX(-130%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+        }
+        .custom-toast.show { transform: translateX(0); }
+        .custom-toast.success { border-right-color: #28a745; }
+        .custom-toast.error { border-right-color: #dc3545; }
+        .custom-toast.info { border-right-color: var(--accent-color); }
+        .custom-toast i { font-size: 1.4rem; }
+        .custom-toast.success i { color: #28a745; }
+        .custom-toast.error i { color: #dc3545; }
+        .custom-toast.info i { color: var(--accent-color); }
     </style>
 </head>
 <body class="prevent-select" oncontextmenu="return false;">
 
     <div class="page-loader" id="page-loader"><div class="spinner"></div></div>
     <div class="bg-overlay"></div>
+
+    <div id="toast-container" class="toast-container"></div>
 
     <nav class="navbar">
         <div class="brand">Mixtaja</div>
@@ -256,51 +291,42 @@
     <main class="container">
         <h2 class="section-title">الكورسات المتاحة</h2>
         <div class="courses-grid" id="courses-container">
-            <!-- سيتم توليد الكورسات هنا بواسطة الجافاسكريبت -->
-        </div>
+            </div>
     </main>
 
-    <!-- نافذة مشاهدة الكورس (مخفية افتراضياً) -->
     <div class="course-viewer-modal" id="courseViewer">
         <div class="viewer-header">
             <div class="viewer-title" id="viewer-title">اسم الكورس</div>
             <button class="btn-close-viewer" onclick="closeCourseViewer()"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="viewer-content">
-            <!-- مشغل الفيديو -->
             <div class="video-section" id="fullscreen-container">
                 <div class="video-wrapper">
-                    <!-- طبقات الحماية لمنع النقر -->
                     <div class="yt-protection-top"></div>
                     <div class="yt-protection-center"></div>
                     <div class="yt-protection-bottom"></div>
                     
                     <iframe id="lesson-player" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
-                <!-- زر ملء الشاشة المخصص -->
                 <button class="fullscreen-btn" onclick="toggleFullScreen()"><i class="fa-solid fa-expand"></i></button>
             </div>
             
-            <!-- قائمة التشغيل والملحقات -->
             <div class="playlist-section">
                 <div>
                     <h3 class="playlist-title">محتوى الكورس (الدروس)</h3>
                     <div id="playlist-container">
-                        <!-- سيتم توليد الدروس هنا -->
-                    </div>
+                        </div>
                 </div>
                 
                 <div style="margin-top: 2rem;">
                     <h3 class="playlist-title">ملحقات الكورس</h3>
                     <div class="files-list" id="files-container">
-                        <!-- سيتم توليد الملفات هنا -->
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- نافذة طلب الشحن -->
     <div class="modal-overlay" id="topupModal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeModal('topupModal')"><i class="fa-solid fa-xmark"></i></button>
@@ -359,12 +385,36 @@
                 icon.classList.add('fa-expand');
             }
         }
+
+        // دالة إنشاء وإظهار الإشعارات المخصصة بشكل مميز بديلة الـ alert
+        window.showToast = (message, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${type}`;
+            
+            let icon = 'fa-circle-check';
+            if (type === 'error') icon = 'fa-circle-xmark';
+            if (type === 'info') icon = 'fa-circle-info';
+            
+            toast.innerHTML = `
+                <i class="fa-solid ${icon}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        };
     </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, collection, onSnapshot, setDoc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCv0C8nEmkov22ZM1vVtgbagQnMnQbvB24",
@@ -382,43 +432,15 @@
         let currentUser = null;
         let userMixCash = 0;
         let unlockedCourses = [];
+        let allLiveCourses = []; // لتخزين الكورسات الحقيقية القادمة من قاعدة البيانات
 
-        // بيانات وهمية للكورسات (حتى يتم عمل لوحة الأدمن)
-        const mockCourses = [
-            {
-                id: 'course_web_01',
-                title: 'تطوير الويب الشامل (HTML, CSS, JS)',
-                price: 150,
-                lessonsCount: 3,
-                lessons: [
-                    { title: 'الدرس الأول: أساسيات HTML', videoId: 'pQN-pnXPaVg' }, // مجرد id يوتيوب تجريبي
-                    { title: 'الدرس الثاني: تصميم CSS', videoId: 'yfoY53QXEnI' },
-                    { title: 'الدرس الثالث: مقدمة جافاسكريبت', videoId: 'W6NZfCO5SIk' }
-                ],
-                files: [
-                    { name: 'ملفات المشروع الأول', link: '#' },
-                    { name: 'مذكرة الأكواد', link: '#' }
-                ]
-            },
-            {
-                id: 'course_firebase_02',
-                title: 'قواعد بيانات Firebase',
-                price: 100,
-                lessonsCount: 1,
-                lessons: [
-                    { title: 'الدرس الأول: ربط قاعدة البيانات', videoId: 'dQw4w9WgXcQ' }
-                ],
-                files: []
-            }
-        ];
-
+        // 1. مراقبة حالة تسجيل دخول الطالب ومزامنة بيانات حسابه ورصيده
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
             } else {
                 currentUser = user;
                 
-                // الاستماع لبيانات المستخدم (الرصيد والكورسات المفتوحة)
                 const userRef = doc(db, "users", user.uid);
                 onSnapshot(userRef, (docSnap) => {
                     if (docSnap.exists()) {
@@ -427,7 +449,6 @@
                         unlockedCourses = data.unlockedCourses || [];
                         document.getElementById('user-coins').innerText = userMixCash;
                         
-                        // إعادة رسم الكورسات بعد تحديث البيانات
                         renderCourses();
                         
                         document.getElementById('page-loader').style.opacity = '0';
@@ -436,22 +457,43 @@
                         setDoc(userRef, { email: user.email, mixCash: 0, unlockedCourses: [] }, { merge: true });
                     }
                 });
+
+                // تفعيل الاستماع اللحظي للكورسات المرفوعة بواسطة الأدمن
+                listenToCoursesLive();
             }
         });
 
-        // رسم الكورسات في الصفحة الرئيسية
+        // 2. جلب وتحديث قائمة الكورسات بالوقت الفعلي من الـ Firestore
+        function listenToCoursesLive() {
+            onSnapshot(collection(db, "courses"), (snapshot) => {
+                allLiveCourses = [];
+                snapshot.forEach((courseDoc) => {
+                    const courseData = courseDoc.data();
+                    courseData.id = courseDoc.id;
+                    allLiveCourses.push(courseData);
+                });
+                renderCourses();
+            });
+        }
+
+        // 3. رسم وبناء بطاقات الكورسات الحية ديناميكياً داخل الواجهة
         function renderCourses() {
             const container = document.getElementById('courses-container');
             container.innerHTML = '';
 
-            mockCourses.forEach(course => {
+            if (allLiveCourses.length === 0) {
+                container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:#888; font-weight:bold;">لا توجد كورسات متاحة على المنصة حالياً.</div>';
+                return;
+            }
+
+            allLiveCourses.forEach(course => {
                 const isUnlocked = unlockedCourses.includes(course.id);
                 
                 let actionButton = '';
                 let lockOverlay = '';
 
                 if (isUnlocked) {
-                    actionButton = `<button class="btn-action btn-open" onclick="window.openCourse('${course.id}')">فتح الكورس</button>`;
+                    actionButton = `<button class="btn-action btn-open" onclick="window.openCourse('${course.id}')">فتح الكورس واالمشاهدة</button>`;
                 } else {
                     lockOverlay = `
                         <div class="locked-overlay">
@@ -470,8 +512,8 @@
                         </div>
                         <div class="course-info">
                             <h3 class="course-title">${course.title}</h3>
-                            <div class="course-meta"><i class="fa-solid fa-list-ul"></i> ${course.lessonsCount} دروس</div>
-                            ${!isUnlocked ? `<div class="course-price">السعر: ${course.price} كاش</div>` : '<div class="course-price" style="color:#1a4f3b">تم الشراء <i class="fa-solid fa-check"></i></div>'}
+                            <div class="course-meta"><i class="fa-solid fa-list-ul"></i> ${course.lessonsCount || 0} دروس</div>
+                            ${!isUnlocked ? `<div class="course-price">السعر: ${course.price} كاش</div>` : '<div class="course-price" style="color:#1a4f3b">تم الشراء بنجاح <i class="fa-solid fa-check"></i></div>'}
                             ${actionButton}
                         </div>
                     </div>
@@ -480,10 +522,10 @@
             });
         }
 
-        // دالة شراء الكورس
+        // 4. دالة شراء الكورس وخصم الكاشات بنظام الإشعارات المطور
         window.buyCourse = async (courseId, price) => {
             if (userMixCash >= price) {
-                const confirmBuy = confirm(`هل أنت متأكد من شراء هذا الكورس بـ ${price} كاش mix؟`);
+                const confirmBuy = confirm(`هل أنت متأكد من رغبتك في شراء هذا الكورس واقتطاع ${price} كاش من رصيدك؟`);
                 if(confirmBuy){
                     try {
                         const userRef = doc(db, "users", currentUser.uid);
@@ -491,38 +533,43 @@
                             mixCash: increment(-price),
                             unlockedCourses: arrayUnion(courseId)
                         });
-                        alert("تم شراء الكورس بنجاح!");
+                        window.showToast("تهانينا! تم شراء الكورس بنجاح وتفعيل المحتوى. 🎉", "success");
                     } catch (error) {
                         console.error("Error buying course:", error);
-                        alert("حدث خطأ أثناء الشراء.");
+                        window.showToast("عفواً، فشلت عملية الشراء. حاول مرة أخرى لاحقاً.", "error");
                     }
                 }
             } else {
-                alert("عفواً، رصيدك من كاشات mix غير كافٍ. يرجى الشحن أولاً.");
+                window.showToast("عفواً، رصيدك من كاشات mix غير كافٍ للاشتراك. يرجى الشحن أولاً! ❌", "error");
             }
         };
 
-        // فتح الكورس (عرض قائمة التشغيل)
+        // 5. فتح واجهة عرض محتويات الكورس المشترى
         window.openCourse = (courseId) => {
-            const course = mockCourses.find(c => c.id === courseId);
+            const course = allLiveCourses.find(c => c.id === courseId);
             if(!course) return;
 
             document.getElementById('viewer-title').innerText = course.title;
             
-            // توليد قائمة الدروس
+            // توليد قائمة الدروس المرفوعة من الأدمن
             const playlistContainer = document.getElementById('playlist-container');
             playlistContainer.innerHTML = '';
-            course.lessons.forEach((lesson, index) => {
-                const isActive = index === 0 ? 'active' : '';
-                playlistContainer.innerHTML += `
-                    <div class="lesson-item ${isActive}" onclick="window.playLesson('${lesson.videoId}', this)">
-                        <i class="fa-solid fa-circle-play"></i>
-                        <span>${lesson.title}</span>
-                    </div>
-                `;
-            });
+            
+            if(course.lessons && course.lessons.length > 0) {
+                course.lessons.forEach((lesson, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    playlistContainer.innerHTML += `
+                        <div class="lesson-item ${isActive}" onclick="window.playLesson('${lesson.videoId}', this)">
+                            <i class="fa-solid fa-circle-play"></i>
+                            <span>${lesson.title}</span>
+                        </div>
+                    `;
+                });
+            } else {
+                playlistContainer.innerHTML = '<span style="color:#999; font-size:0.9rem;">لا توجد دروس مرفوعة في هذا الكورس بعد.</span>';
+            }
 
-            // توليد الملفات
+            // توليد الملفات والملحقات والكتب إن وجدت
             const filesContainer = document.getElementById('files-container');
             filesContainer.innerHTML = '';
             if(course.files && course.files.length > 0){
@@ -534,51 +581,47 @@
                     `;
                 });
             } else {
-                filesContainer.innerHTML = '<span style="color:#999; font-size:0.9rem;">لا توجد ملحقات لهذا الكورس</span>';
+                filesContainer.innerHTML = '<span style="color:#999; font-size:0.9rem;">لا توجد ملفات أو ملخصات ملحقة حالياً.</span>';
             }
 
-            // تشغيل أول درس تلقائياً
-            if(course.lessons.length > 0){
+            // تشغيل أول فيديو تلقائياً عند فتح الكورس
+            if(course.lessons && course.lessons.length > 0){
                 setIframeSource(course.lessons[0].videoId);
+            } else {
+                document.getElementById('lesson-player').src = '';
             }
 
             document.getElementById('courseViewer').classList.add('active');
-            document.body.style.overflow = 'hidden'; // منع التمرير في الخلفية
+            document.body.style.overflow = 'hidden';
         };
 
-        // تشغيل درس محدد
+        // تشغيل فيديو الدرس المحدد ومزامنة التنشيط
         window.playLesson = (videoId, element) => {
-            // إزالة التفعيل من كل الدروس
             document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
-            // إضافة التفعيل للدرس الحالي
             element.classList.add('active');
-            // تغيير مصدر الفيديو
             setIframeSource(videoId);
         };
 
-        // ضبط مصدر الفيديو مع بارامترات الحماية
         function setIframeSource(videoId) {
             const iframe = document.getElementById('lesson-player');
-            // controls=0: إخفاء أدوات التحكم ، modestbranding=1: إخفاء لوجو يوتيوب ، rel=0: عدم عرض فيديوهات مقترحة خارجية
             iframe.src = `https://www.youtube.com/embed/${videoId}?controls=0&modestbranding=1&rel=0&disablekb=1`;
         }
 
-        // إغلاق نافذة الكورس
         window.closeCourseViewer = () => {
             document.getElementById('courseViewer').classList.remove('active');
             document.body.style.overflow = 'auto';
-            document.getElementById('lesson-player').src = ''; // إيقاف الفيديو
+            document.getElementById('lesson-player').src = ''; 
         };
 
         window.logout = () => {
             signOut(auth).then(() => window.location.href = 'index.html');
         };
 
-        // إرسال طلب الشحن لتيليجرام
+        // 6. معالجة إرسال طلب الشحن المالي وإعلام المستخدم عبر الـ Toast
         document.getElementById('topup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit-topup');
-            btn.innerText = 'جاري الإرسال...'; btn.disabled = true;
+            btn.innerText = 'جاري إرسال الطلب...'; btn.disabled = true;
 
             const amount = document.getElementById('amount').value;
             const phone = document.getElementById('phone').value;
@@ -599,9 +642,13 @@
                     const response = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, { method: 'POST', body: formData });
                     if (response.ok) {
                         closeModal('topupModal');
-                        alert('تم استلام طلبك بنجاح! سيتم المراجعة وإضافة الكاشات قريباً.');
-                    } else { alert("حدث خطأ أثناء إرسال الطلب."); }
-                } catch (error) { alert("حدث خطأ في الاتصال."); }
+                        window.showToast('تم استلام طلب الشحن بنجاح! سيتم المراجعة وإضافة الرصيد قريباً. ⏳', 'info');
+                    } else { 
+                        window.showToast("حدث خطأ غير متوقع أثناء معالجة البيانات، حاول مرة أخرى.", "error"); 
+                    }
+                } catch (error) { 
+                    window.showToast("فشل الاتصال بالخادم، تحقق من اتصالك بالإنترنت.", "error"); 
+                }
             }
             btn.innerText = 'إرسال الطلب'; btn.disabled = false;
         });
