@@ -202,17 +202,18 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; border: none;
         }
 
-        /* إصلاح طبقات حماية اليوتيوب للسماح بالنقرات لتشغيل الفيديو */
-        .yt-protection-top, .yt-protection-bottom, .yt-protection-center {
-            position: absolute; left: 0; right: 0; z-index: 5; pointer-events: none; /* تمنع حجب النقرات عن الـ iframe */
+        /* حماية متطورة لمنع مغادرة الفيديو أو الضغط على خيارات المشاركة ويوتيوب */
+        .yt-protection-top, .yt-protection-bottom-right {
+            position: absolute; z-index: 5; pointer-events: auto; background: transparent;
         }
-        .yt-protection-top { top: 0; height: 50px; background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent); }
-        .yt-protection-bottom { bottom: 0; height: 50px; background: linear-gradient(to top, rgba(0,0,0,0.3), transparent); }
-        .yt-protection-center { top: 50%; transform: translateY(-50%); height: 40px; }
+        /* حجب كامل لشريط العناوين العلوي وزر المشاركة */
+        .yt-protection-top { top: 0; left: 0; right: 0; height: 60px; }
+        /* حجب دقيق لزاوية شعار يوتيوب السفلي لمنع الانتقال للموقع */
+        .yt-protection-bottom-right { bottom: 0; right: 0; width: 150px; height: 55px; }
 
         /* زر ملء الشاشة المخصص */
         .fullscreen-btn {
-            position: absolute; bottom: 15px; right: 15px; z-index: 20;
+            position: absolute; bottom: 15px; left: 15px; z-index: 20;
             background: rgba(0,0,0,0.7); color: white; border: none; padding: 10px 14px;
             border-radius: 6px; cursor: pointer; font-size: 1.1rem; transition: var(--transition);
         }
@@ -366,8 +367,7 @@
             <div class="video-section" id="fullscreen-container">
                 <div class="video-wrapper">
                     <div class="yt-protection-top"></div>
-                    <div class="yt-protection-center"></div>
-                    <div class="yt-protection-bottom"></div>
+                    <div class="yt-protection-bottom-right"></div>
                     
                     <iframe id="lesson-player" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
@@ -424,7 +424,6 @@
             if(id === 'topupModal') document.getElementById('topup-form').reset();
         }
         
-        // إغلاق النوافذ عند النقر خارجها
         window.addEventListener('click', function(event) {
             if (event.target.classList.contains('modal-overlay')) {
                 event.target.classList.remove('active');
@@ -435,13 +434,11 @@
             }
         });
 
-        // فتح وإغلاق قائمة الإشعارات المنسدلة
         function toggleNotificationDropdown(event) {
             event.stopPropagation();
             document.getElementById('notificationDropdown').classList.toggle('active');
         }
 
-        // كود ملء الشاشة المخصص لحاوية الفيديو
         function toggleFullScreen() {
             const container = document.getElementById("fullscreen-container");
             const icon = document.querySelector('.fullscreen-btn i');
@@ -461,7 +458,6 @@
             }
         }
 
-        // دالة إظهار الإشعارات المخصصة المحدثة
         window.showToast = (message, type = 'success') => {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -489,7 +485,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, setDoc, updateDoc, arrayUnion, increment, query, orderBy, limit, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, collection, onSnapshot, setDoc, updateDoc, arrayUnion, increment, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCv0C8nEmkov22ZM1vVtgbagQnMnQbvB24",
@@ -510,7 +506,6 @@
         let allLiveCourses = [];
         let localNotifications = [];
 
-        // طلب إذن وصول إشعارات جوجل من المتصفح لربطها بلوحة التحكم
         async function requestBrowserNotificationPermission() {
             if (!("Notification" in window)) return;
             if (Notification.permission === "default") {
@@ -518,7 +513,6 @@
             }
         }
 
-        // إطلاق إشعار نظام حقيقي على الجهاز
         function triggerSystemNotification(title, body) {
             if ("Notification" in window && Notification.permission === "granted") {
                 new Notification(title, {
@@ -529,7 +523,7 @@
             }
         }
 
-        // 1. مراقبة حالة تسجيل دخول الطالب ومزامنة الإشعارات والبيانات المالية
+        // 1. مراقبة حالة تسجيل دخول الطالب ومزامنة البيانات المالية والإشعارات الموحدة
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -554,7 +548,6 @@
                     }
                 });
 
-                // تفعيل الاستماع اللحظي للكورسات والإشعارات الخاصة بالكامل
                 listenToCoursesLive();
                 listenToNotificationsLive(user.uid);
             }
@@ -573,27 +566,32 @@
             });
         }
 
-        // 3. نظام متطور للاستماع اللحظي للإشعارات المرسلة من الأدمن لكل طالب
+        // 3. نظام متطور وبدون أخطاء للاستماع اللحظي للرسائل الموحدة والخاصة المرسلة من الأدمن
         function listenToNotificationsLive(uid) {
-            const notifRef = collection(db, "users", uid, "notifications");
-            const q = query(notifRef, orderBy("createdAt", "desc"), limit(20));
-            
+            const q = query(collection(db, "notifications"), orderBy("createdAt", "desc"), limit(30));
             let isFirstLoad = true;
 
             onSnapshot(q, (snapshot) => {
                 localNotifications = [];
                 let unreadCount = 0;
+                
+                // استدعاء سجل الإشعارات المقروءة المخزن محلياً لهذا الحساب
+                const readNotifs = JSON.parse(localStorage.getItem(`read_notifs_${uid}`)) || [];
 
                 snapshot.forEach((doc) => {
                     const notif = doc.data();
                     notif.id = doc.id;
-                    localNotifications.push(notif);
-                    if (!notif.read) {
-                        unreadCount++;
+                    
+                    // الفلترة البرمجية: التحقق مما إذا كان الإشعار موجهاً للكل أو لهذا الحساب خصيصاً
+                    if (notif.userId === "all" || notif.userId === uid) {
+                        notif.read = readNotifs.includes(notif.id);
+                        localNotifications.push(notif);
+                        if (!notif.read) {
+                            unreadCount++;
+                        }
                     }
                 });
 
-                // تحديث عداد الجرس العلوي
                 const badge = document.getElementById('bell-count');
                 if (unreadCount > 0) {
                     badge.innerText = unreadCount;
@@ -602,14 +600,20 @@
                     badge.style.display = 'none';
                 }
 
-                // عرض الإشعار المنبثق وإشعار النظام فقط عند وصول إشعار جديد حقيقي وليس عند التحميل الأول للملف
+                // تفعيل التنبيه والـ Toast الفوري في حال تم إرسال إشعار جديد حقيقي أثناء تصفح الطالب
                 if (!isFirstLoad && snapshot.docChanges().some(change => change.type === "added")) {
-                    const newChange = snapshot.docChanges().find(change => change.type === "added");
-                    if(newChange) {
-                        const newNotif = newChange.doc.data();
-                        window.showToast(`${newNotif.title}: ${newNotif.body}`, "info");
-                        triggerSystemNotification(newNotif.title, newNotif.body);
-                    }
+                    snapshot.docChanges().forEach(change => {
+                        if (change.type === "added") {
+                            const newNotif = change.doc.data();
+                            const notifId = change.doc.id;
+                            if (newNotif.userId === "all" || newNotif.userId === uid) {
+                                if (!readNotifs.includes(notifId)) {
+                                    window.showToast(`${newNotif.title}: ${newNotif.body}`, "info");
+                                    triggerSystemNotification(newNotif.title, newNotif.body);
+                                }
+                            }
+                        }
+                    });
                 }
 
                 isFirstLoad = false;
@@ -617,7 +621,7 @@
             });
         }
 
-        // بناء قائمة الإشعارات داخل الصندوق المنسدلة
+        // بناء قائمة الإشعارات في صندوق الإشعارات المنسدلة
         function renderNotificationsDropdown() {
             const container = document.getElementById('notif-dropdown-body');
             container.innerHTML = '';
@@ -641,26 +645,24 @@
             });
         }
 
-        // تحويل كافة الإشعارات المستلمة إلى مقروءة عند النقر على الزر
-        document.getElementById('btn-mark-all-read').addEventListener('click', async () => {
+        // تعيين كافة الإشعارات كمقروءة وحفظ معرفاتها محلياً
+        document.getElementById('btn-mark-all-read').addEventListener('click', () => {
             if (!currentUser || localNotifications.length === 0) return;
-            const batch = writeBatch(db);
             
-            localNotifications.forEach(notif => {
-                if(!notif.read) {
-                    const docRef = doc(db, "users", currentUser.uid, "notifications", notif.id);
-                    batch.update(docRef, { read: true });
-                }
-            });
+            const readNotifs = JSON.parse(localStorage.getItem(`read_notifs_${currentUser.uid}`)) || [];
+            const allIds = localNotifications.map(n => n.id);
+            const updatedReadNotifs = [...new Set([...readNotifs, ...allIds])];
             
-            try {
-                await batch.commit();
-            } catch (err) {
-                console.error("Error setting notification status: ", err);
-            }
+            localStorage.setItem(`read_notifs_${currentUser.uid}`, JSON.stringify(updatedReadNotifs));
+            
+            localNotifications.forEach(n => n.read = true);
+            document.getElementById('bell-count').style.display = 'none';
+            renderNotificationsDropdown();
+            
+            window.showToast("تم تعيين جميع الإشعارات كمقروءة بنجاح.", "success");
         });
 
-        // 4. رسم وبناء بطاقات الكورسات الحية ديناميكياً داخل الواجهة
+        // 4. بناء وعرض بطاقات الكورسات الحية ديناميكياً داخل الواجهة
         function renderCourses() {
             const container = document.getElementById('courses-container');
             container.innerHTML = '';
@@ -706,7 +708,7 @@
             });
         }
 
-        // 5. دالة شراء الكورس وخصم الكاشات بنظام الإشعارات المطور
+        // 5. دالة شراء الكورس وخصم الكاشات
         window.buyCourse = async (courseId, price) => {
             if (userMixCash >= price) {
                 const confirmBuy = confirm(`هل أنت متأكد من رغبتك في شراء هذا الكورس واقتطاع ${price} كاش من رصيدك؟`);
@@ -728,7 +730,7 @@
             }
         };
 
-        // 6. فتح واجهة عرض محتويات الكورس المشترى
+        // 6. فتح واجهة عرض محتويات الكورس المشترى وتجهيز المشغل الآمن
         window.openCourse = (courseId) => {
             const course = allLiveCourses.find(c => c.id === courseId);
             if(!course) return;
@@ -766,7 +768,6 @@
                 filesContainer.innerHTML = '<span style="color:#999; font-size:0.9rem;">لا توجد ملفات أو ملخصات ملحقة حالياً.</span>';
             }
 
-            // تشغيل أول فيديو تلقائياً عند فتح الكورس
             if(course.lessons && course.lessons.length > 0){
                 setIframeSource(course.lessons[0].videoId);
             } else {
@@ -777,7 +778,6 @@
             document.body.style.overflow = 'hidden';
         };
 
-        // تشغيل فيديو الدرس المحدد ومزامنة التنشيط
         window.playLesson = (videoId, element) => {
             document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
@@ -786,8 +786,8 @@
 
         function setIframeSource(videoId) {
             const iframe = document.getElementById('lesson-player');
-            // تم ضبط البرامترات لتعمل بسلاسة فائقة ودعم المشغل الداخلي بالكامل والتوافق مع أدوات التحكم المخصصة
-            iframe.src = `https://www.youtube.com/embed/${videoId}?controls=1&modestbranding=1&rel=0&showinfo=0&autoplay=1`;
+            // ضبط البارامترات بدقة لإلغاء الاقتراحات الخارجية والفيديوهات ذات الصلة غير التابعة للقناة
+            iframe.src = `https://www.youtube.com/embed/${videoId}?controls=1&modestbranding=1&rel=0&showinfo=0&autoplay=1&iv_load_policy=3`;
         }
 
         window.closeCourseViewer = () => {
@@ -800,7 +800,7 @@
             signOut(auth).then(() => window.location.href = 'index.html');
         };
 
-        // 7. معالجة إرسال طلب الشحن المالي وإعلام المستخدم عبر الـ Toast
+        // 7. معالجة إرسال طلب الشحن المالي عبر تليجرام وبث التنبيهات للمستخدم
         document.getElementById('topup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit-topup');
