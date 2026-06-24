@@ -1,1379 +1,840 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <meta name="theme-color" content="#194a38" />
-  <meta name="robots" content="noindex, nofollow, noarchive" />
-  <title>Mixtaja - لوحة التحكم التعليمية</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="theme-color" content="#194a38">
+    
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    
+    <title>Mixtaja - لوحة التحكم التعليمية</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <style>
-    :root {
-      --primary-color: #1a4f3b;
-      --primary-hover: #133b2b;
-      --accent-color: #9a7b4f;
-      --text-dark: #2d3436;
-      --text-muted: #667085;
-      --bg-color: #fcfbf9;
-      --white: #ffffff;
-      --card: rgba(255,255,255,.86);
-      --shadow: 0 16px 38px rgba(0, 0, 0, 0.10);
-      --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.08);
-      --transition: all 0.28s ease;
-      --radius: 18px;
-      --radius-lg: 24px;
-      --border: 1px solid rgba(0,0,0,0.06);
-    }
+    <style>
+        :root {
+            --primary-color: #1a4f3b;
+            --primary-hover: #133b2b;
+            --accent-color: #9a7b4f;
+            --text-dark: #333333;
+            --bg-color: #fcfbf9;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
-    html { scroll-behavior: smooth; }
-    body {
-      background:
-        linear-gradient(135deg, rgba(252,251,249,.92), rgba(244,240,232,.88)),
-        url('logo1.png') center center / cover fixed;
-      min-height: 100vh;
-      color: var(--text-dark);
-      overflow-x: hidden;
-    }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
 
-    .page-loader {
-      position: fixed; inset: 0; z-index: 9999;
-      background: var(--bg-color);
-      display: flex; align-items: center; justify-content: center;
-      transition: opacity .45s ease, visibility .45s ease;
-    }
-    .spinner {
-      width: 52px; height: 52px; border: 5px solid rgba(26,79,59,.18);
-      border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+        body {
+            background: url('logo1.png') center center/cover fixed;
+            min-height: 100vh; color: var(--text-dark);
+        }
 
-    .bg-overlay {
-      position: fixed; inset: 0;
-      background: linear-gradient(135deg, rgba(252, 251, 249, 0.80) 0%, rgba(245, 240, 230, 0.70) 100%);
-      z-index: -1;
-      backdrop-filter: blur(6px);
-    }
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(252, 251, 249, 0.95) 0%, rgba(245, 240, 230, 0.85) 100%);
+            z-index: -1; backdrop-filter: blur(5px);
+        }
 
-    .prevent-select { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
+        /* شريط التنقل */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95); padding: 1rem 2rem; box-shadow: var(--shadow);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
 
-    .app-shell {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+        .brand { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); }
+        .nav-tools { display: flex; align-items: center; gap: 1.2rem; }
 
-    .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 200;
-      background: rgba(255,255,255,.92);
-      backdrop-filter: blur(12px);
-      padding: 1rem clamp(1rem, 2vw, 2rem);
-      box-shadow: 0 2px 20px rgba(0,0,0,.06);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      border-bottom: var(--border);
-    }
+        .coins-badge {
+            background: rgba(154, 123, 79, 0.1); border: 1px solid var(--accent-color);
+            padding: 0.5rem 1rem; border-radius: 20px; display: flex; align-items: center;
+            gap: 0.8rem; font-weight: 700; color: var(--primary-color);
+        }
+        .coins-amount { color: var(--accent-color); font-size: 1.2rem; }
 
-    .brand-wrap {
-      display: flex;
-      align-items: center;
-      gap: .8rem;
-      min-width: 0;
-    }
-    .brand-mark {
-      width: 44px; height: 44px; border-radius: 14px;
-      background: linear-gradient(145deg, var(--primary-color), #285f49);
-      color: #fff; display: grid; place-items: center;
-      box-shadow: var(--shadow-soft);
-      flex: 0 0 auto;
-    }
-    .brand {
-      display: flex; flex-direction: column; gap: .1rem;
-      min-width: 0;
-    }
-    .brand strong {
-      font-size: 1.25rem; color: var(--primary-color);
-      line-height: 1.1;
-    }
-    .brand span {
-      font-size: .88rem; color: var(--text-muted);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
+        .btn-add {
+            background: var(--accent-color); color: var(--white); border: none;
+            width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: var(--transition);
+        }
+        .btn-add:hover { transform: scale(1.1); background: var(--primary-color); }
 
-    .nav-tools {
-      display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;
-      justify-content: flex-end;
-    }
+        /* أيقونة وقائمة الإشعارات المتقدمة */
+        .notification-container {
+            position: relative;
+        }
+        .btn-bell {
+            background: rgba(26, 79, 59, 0.05); border: none; color: var(--primary-color);
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+            position: relative; transition: var(--transition);
+        }
+        .btn-bell:hover { background: rgba(26, 79, 59, 0.1); color: var(--accent-color); }
+        .bell-badge {
+            position: absolute; top: -2px; right: -2px; background: #dc3545; color: white;
+            font-size: 0.75rem; width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+            box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
+        }
+        .notification-dropdown {
+            position: absolute; top: 130%; left: 0; width: 320px; background: var(--white);
+            border-radius: 12px; box-shadow: 0 10px 35px rgba(0,0,0,0.15);
+            border: 1px solid rgba(0,0,0,0.05); display: none; flex-direction: column; z-index: 1000;
+            max-height: 420px; overflow-y: auto; overflow-x: hidden;
+        }
+        .notification-dropdown.active { display: flex; animation: fadeInTop 0.3s ease forwards; }
+        
+        @keyframes fadeInTop {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    .coins-badge {
-      background: rgba(154, 123, 79, 0.10);
-      border: 1px solid rgba(154,123,79,.35);
-      padding: .55rem .85rem;
-      border-radius: 999px;
-      display: flex; align-items: center; gap: .65rem;
-      font-weight: 700; color: var(--primary-color);
-      box-shadow: 0 8px 20px rgba(154,123,79,.08);
-      white-space: nowrap;
-    }
-    .coins-amount { color: var(--accent-color); font-size: 1.15rem; min-width: 1.5ch; text-align: center; }
-    .btn-icon {
-      width: 34px; height: 34px; border-radius: 50%;
-      border: none; cursor: pointer; display: grid; place-items: center;
-      transition: var(--transition); color: #fff;
-      flex: 0 0 auto;
-    }
-    .btn-add { background: var(--accent-color); }
-    .btn-add:hover { transform: translateY(-1px) scale(1.05); background: var(--primary-color); }
-    .btn-bell {
-      position: relative; background: rgba(26,79,59,.10); color: var(--primary-color);
-      border: 1px solid rgba(26,79,59,.15);
-    }
-    .btn-bell:hover { background: rgba(26,79,59,.16); transform: translateY(-1px); }
-    .badge-dot {
-      position: absolute; top: -3px; left: -3px;
-      min-width: 18px; height: 18px; padding: 0 4px;
-      border-radius: 999px; background: #d92d20; color: #fff;
-      font-size: .72rem; font-weight: 800; display: grid; place-items: center;
-      border: 2px solid #fff;
-      box-shadow: 0 4px 10px rgba(217,45,32,.25);
-    }
+        .dropdown-header {
+            padding: 1rem; border-bottom: 1px solid #eee; display: flex;
+            justify-content: space-between; align-items: center; font-weight: bold; color: var(--primary-color);
+            background: #fafafa; border-top-left-radius: 12px; border-top-right-radius: 12px;
+        }
+        .btn-clear-notif { background: none; border: none; color: #666; cursor: pointer; font-size: 0.85rem; }
+        .btn-clear-notif:hover { color: #dc3545; text-decoration: underline; }
+        
+        .dropdown-body { display: flex; flex-direction: column; }
+        .notification-item {
+            padding: 1rem; border-bottom: 1px solid #f8f8f8; font-size: 0.9rem;
+            transition: var(--transition); display: flex; flex-direction: column; gap: 4px; text-align: right;
+        }
+        .notification-item:hover { background: #fcfbf9; }
+        .notification-item.unread { background: rgba(26, 79, 59, 0.03); border-right: 4px solid var(--accent-color); }
+        .notification-item .notif-title { font-weight: 700; color: var(--primary-color); }
+        .notification-item .notif-body { color: #555; line-height: 1.4; }
+        .notification-item .notif-time { font-size: 0.75rem; color: #999; margin-top: 2px; }
+        .no-notifications { padding: 2rem; text-align: center; color: #999; font-size: 0.9rem; font-weight: 500; }
 
-    .btn-logout {
-      background: transparent; border: 1px solid rgba(220,53,69,.22);
-      color: #dc3545; font-weight: 700; cursor: pointer; font-size: .98rem;
-      padding: .62rem .95rem; border-radius: 999px; transition: var(--transition);
-    }
-    .btn-logout:hover { background: rgba(220,53,69,.08); transform: translateY(-1px); }
+        .btn-logout { background: none; border: none; color: #dc3545; font-weight: 600; cursor: pointer; font-size: 1rem; margin-right: 0.5rem; }
 
-    .container {
-      width: min(1200px, calc(100% - 2rem));
-      margin: 1.25rem auto 3rem;
-    }
+        /* الكورسات */
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .section-title {
+            margin-bottom: 2rem; color: var(--primary-color); font-size: 1.5rem;
+            border-right: 4px solid var(--accent-color); padding-right: 10px;
+        }
 
-    .hero {
-      display: grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 1rem;
-      margin-bottom: 1.25rem;
-    }
-    .hero-card {
-      background: var(--card);
-      border: var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow);
-      padding: 1.25rem;
-      overflow: hidden;
-      position: relative;
-    }
-    .hero-title {
-      color: var(--primary-color);
-      font-size: clamp(1.2rem, 2vw, 1.65rem);
-      margin-bottom: .4rem;
-      line-height: 1.3;
-    }
-    .hero-subtitle { color: var(--text-muted); line-height: 1.8; font-size: .98rem; }
-    .hero-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: .75rem;
-      margin-top: 1rem;
-    }
-    .stat {
-      background: rgba(255,255,255,.72);
-      border: var(--border);
-      border-radius: 16px;
-      padding: .8rem .9rem;
-    }
-    .stat strong { display:block; color: var(--primary-color); font-size: 1.15rem; }
-    .stat span { color: var(--text-muted); font-size: .86rem; }
+        .courses-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;
+        }
 
-    .quick-actions {
-      display: flex; flex-wrap: wrap; gap: .75rem;
-      align-content: start;
-    }
-    .pill {
-      border: none; cursor: pointer; border-radius: 999px;
-      padding: .8rem 1rem;
-      font-weight: 800; transition: var(--transition);
-      background: rgba(26,79,59,.08);
-      color: var(--primary-color);
-      border: 1px solid rgba(26,79,59,.14);
-    }
-    .pill:hover { transform: translateY(-1px); background: rgba(26,79,59,.12); }
-    .pill.primary { background: var(--primary-color); color: #fff; }
-    .pill.primary:hover { background: var(--primary-hover); }
+        .course-card {
+            background: var(--white); border-radius: 15px; overflow: hidden;
+            box-shadow: var(--shadow); transition: var(--transition); border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+        }
+        .course-card:hover { transform: translateY(-5px); }
 
-    .section-title {
-      margin: 1.5rem 0 1rem;
-      color: var(--primary-color);
-      font-size: clamp(1.15rem, 1.8vw, 1.45rem);
-      border-right: 4px solid var(--accent-color);
-      padding-right: 10px;
-    }
+        .course-thumbnail {
+            width: 100%; height: 180px; background: var(--primary-color);
+            display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 3rem;
+            position: relative;
+        }
 
-    .courses-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.25rem;
-    }
+        /* قفل الكورس */
+        .locked-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; color: var(--white); z-index: 2;
+        }
+        .locked-overlay i { font-size: 3rem; margin-bottom: 10px; color: var(--accent-color); }
 
-    .course-card {
-      background: rgba(255,255,255,.92);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: transform .22s ease, box-shadow .22s ease;
-      border: var(--border);
-      position: relative;
-    }
-    .course-card:hover { transform: translateY(-4px); box-shadow: 0 20px 36px rgba(0,0,0,.10); }
+        .course-info { padding: 1.5rem; }
+        .course-title { font-size: 1.2rem; color: var(--primary-color); margin-bottom: 0.5rem; }
+        .course-meta { color: #666; font-size: 0.9rem; margin-bottom: 1rem; }
+        .course-price { color: var(--accent-color); font-weight: bold; font-size: 1.1rem; }
 
-    .course-thumbnail {
-      width: 100%; min-height: 180px;
-      background: linear-gradient(145deg, var(--primary-color), #285f49);
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 3rem; position: relative; overflow: hidden;
-    }
-    .course-thumbnail::after {
-      content: '';
-      position: absolute; inset: auto -20% -45% auto;
-      width: 140px; height: 140px; border-radius: 50%;
-      background: rgba(255,255,255,.08);
-    }
+        .btn-action {
+            width: 100%; padding: 0.8rem; border: none; border-radius: 8px; font-weight: bold;
+            cursor: pointer; transition: var(--transition); margin-top: 1rem; font-size: 1rem;
+        }
+        .btn-buy { background: var(--accent-color); color: var(--white); }
+        .btn-buy:hover { background: #82663f; }
+        .btn-open { background: var(--primary-color); color: var(--white); }
+        .btn-open:hover { background: var(--primary-hover); }
 
-    .locked-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.58));
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      color: #fff; z-index: 2; text-align: center;
-      gap: .35rem;
-    }
-    .locked-overlay i { font-size: 2.6rem; color: #f0c36e; }
+        /* نافذة مشاهدة الكورس المطورة والمتجاوبة بالكامل */
+        .course-viewer-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color); z-index: 1000;
+            display: none; flex-direction: column;
+        }
+        .course-viewer-modal.active { display: flex; }
 
-    .course-info { padding: 1.15rem; }
-    .course-title { font-size: 1.12rem; color: var(--primary-color); margin-bottom: .45rem; line-height: 1.5; }
-    .course-meta { color: var(--text-muted); font-size: .92rem; margin-bottom: .5rem; display:flex; align-items:center; gap:.45rem; }
-    .course-price { color: var(--accent-color); font-weight: 800; font-size: 1.05rem; margin-top: .25rem; }
-    .btn-action {
-      width: 100%; padding: .88rem; border: none; border-radius: 12px; font-weight: 800;
-      cursor: pointer; transition: var(--transition); margin-top: .95rem; font-size: 1rem;
-    }
-    .btn-buy { background: linear-gradient(135deg, #9a7b4f, #8a6b40); color: var(--white); }
-    .btn-buy:hover { filter: brightness(.95); transform: translateY(-1px); }
-    .btn-open { background: linear-gradient(135deg, var(--primary-color), #285f49); color: var(--white); }
-    .btn-open:hover { filter: brightness(.96); transform: translateY(-1px); }
+        .viewer-header {
+            background: var(--white); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center; z-index: 10;
+        }
+        .viewer-title { color: var(--primary-color); font-weight: bold; font-size: 1.2rem; }
+        .btn-close-viewer { background: none; border: none; font-size: 1.5rem; color: #dc3545; cursor: pointer; }
 
-    .course-viewer-modal {
-      position: fixed; inset: 0;
-      background: #f7f7f4;
-      z-index: 1000;
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .course-viewer-modal.active { display: flex; }
+        .viewer-content {
+            display: flex; flex: 1; overflow: hidden; height: calc(100vh - 60px);
+        }
+        @media (max-width: 991px) {
+            .viewer-content { flex-direction: column; overflow-y: auto; height: auto; }
+        }
 
-    .viewer-header {
-      background: rgba(255,255,255,.96);
-      padding: .9rem 1rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      display: flex; justify-content: space-between; align-items: center; gap: .8rem;
-      border-bottom: var(--border);
-      position: sticky; top: 0; z-index: 4;
-    }
-    .viewer-title { color: var(--primary-color); font-weight: 800; font-size: 1.1rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .btn-close-viewer {
-      background: rgba(220,53,69,.08); border: 1px solid rgba(220,53,69,.16); font-size: 1rem;
-      color: #dc3545; cursor: pointer; width: 40px; height: 40px; border-radius: 12px;
-    }
+        /* مشغل الفيديو الاحترافي المتجاوب */
+        .video-section {
+            flex: 2; background: #000; position: relative; display: flex; align-items: center; justify-content: center;
+        }
+        @media (max-width: 991px) {
+            .video-section { width: 100%; height: 300px; flex: none; }
+        }
+        @media (max-width: 576px) {
+            .video-section { height: 210px; }
+        }
+        
+        .video-wrapper {
+            position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+        }
+        .video-wrapper iframe {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; border: none;
+        }
 
-    .viewer-content { display: flex; flex: 1; overflow: hidden; min-height: 0; }
-    .video-section {
-      flex: 2; min-width: 0;
-      background: #000;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-    .video-wrapper {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: #000;
-      flex: 1;
-      min-height: 240px;
-    }
-    .video-wrapper iframe {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      border: 0;
-      background: #000;
-    }
-    .yt-protection-top, .yt-protection-bottom, .yt-protection-center {
-      position: absolute; left: 0; right: 0; z-index: 10;
-      pointer-events: none;
-    }
-    .yt-protection-top { top: 0; height: 52px; }
-    .yt-protection-bottom { bottom: 0; height: 52px; }
-    .yt-protection-center { top: 50%; transform: translateY(-50%); height: 52px; }
+        /* إصلاح طبقات حماية اليوتيوب للسماح بالنقرات لتشغيل الفيديو */
+        .yt-protection-top, .yt-protection-bottom, .yt-protection-center {
+            position: absolute; left: 0; right: 0; z-index: 5; pointer-events: none; /* تمنع حجب النقرات عن الـ iframe */
+        }
+        .yt-protection-top { top: 0; height: 50px; background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent); }
+        .yt-protection-bottom { bottom: 0; height: 50px; background: linear-gradient(to top, rgba(0,0,0,0.3), transparent); }
+        .yt-protection-center { top: 50%; transform: translateY(-50%); height: 40px; }
 
-    .fullscreen-btn {
-      position: absolute; bottom: 14px; right: 14px; z-index: 20;
-      background: rgba(0,0,0,0.60); color: white; border: none; padding: 10px 12px;
-      border-radius: 12px; cursor: pointer; font-size: 1rem; transition: var(--transition);
-      backdrop-filter: blur(8px);
-    }
-    .fullscreen-btn:hover { background: rgba(26,79,59,.9); }
+        /* زر ملء الشاشة المخصص */
+        .fullscreen-btn {
+            position: absolute; bottom: 15px; right: 15px; z-index: 20;
+            background: rgba(0,0,0,0.7); color: white; border: none; padding: 10px 14px;
+            border-radius: 6px; cursor: pointer; font-size: 1.1rem; transition: var(--transition);
+        }
+        .fullscreen-btn:hover { background: var(--primary-color); transform: scale(1.05); }
 
-    .playlist-section {
-      flex: 1; min-width: 300px; background: rgba(255,255,255,.96);
-      border-right: 1px solid #eee; overflow-y: auto; padding: 1rem;
-      display: flex; flex-direction: column; gap: 1rem;
-    }
-    .playlist-title {
-      color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: .55rem; margin-bottom: .9rem;
-      font-size: 1rem;
-    }
-    .lesson-item {
-      padding: .92rem 1rem; background: #f8f9f8; border-radius: 14px; margin-bottom: .55rem;
-      cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 10px;
-      border: 1px solid transparent; line-height: 1.6;
-    }
-    .lesson-item:hover { background: #f0f2ef; transform: translateY(-1px); }
-    .lesson-item.active { background: rgba(26, 79, 59, 0.10); border-color: rgba(26, 79, 59, .2); font-weight: 800; }
+        /* قائمة الدروس والملحقات */
+        .playlist-section {
+            flex: 1; background: var(--white); border-right: 1px solid #eee;
+            overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;
+        }
+        @media (max-width: 991px) {
+            .playlist-section { width: 100%; overflow-y: visible; height: auto; border-right: none; }
+        }
+        
+        .playlist-title { color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 0.5rem; margin-bottom: 1rem;}
+        
+        .lesson-item {
+            padding: 1rem; background: #f9f9f9; border-radius: 8px; margin-bottom: 0.5rem;
+            cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 10px;
+            border: 1px solid transparent;
+        }
+        .lesson-item:hover { background: #f0f0f0; }
+        .lesson-item.active { background: rgba(26, 79, 59, 0.1); border-color: var(--primary-color); font-weight: bold; }
+        
+        .files-list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .file-link {
+            background: #f0f0f0; color: var(--text-dark); text-decoration: none;
+            padding: 8px 15px; border-radius: 5px; font-size: 0.9rem; transition: var(--transition);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .file-link:hover { background: var(--primary-color); color: var(--white); }
 
-    .files-list { display: flex; flex-wrap: wrap; gap: .65rem; }
-    .file-link {
-      background: #f0f0f0; color: var(--text-dark); text-decoration: none;
-      padding: 10px 14px; border-radius: 12px; font-size: .92rem; transition: var(--transition);
-      display: inline-flex; align-items: center; gap: 7px; border: 1px solid rgba(0,0,0,.04);
-    }
-    .file-link:hover { background: var(--primary-color); color: var(--white); transform: translateY(-1px); }
+        /* النوافذ المنبثقة العامة */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center; z-index: 2000;
+            opacity: 0; visibility: hidden; transition: var(--transition);
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: var(--white); border-radius: 20px; padding: 2.5rem; width: 90%; max-width: 400px;
+            position: relative; transform: scale(0.8); transition: var(--transition);
+        }
+        .modal-overlay.active .modal-content { animation: jelly 0.6s ease forwards; }
 
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 2000;
-      opacity: 0; visibility: hidden; transition: var(--transition);
-      padding: 1rem;
-    }
-    .modal-overlay.active { opacity: 1; visibility: visible; }
-    .modal-content {
-      background: var(--white); border-radius: 24px; padding: 1.25rem;
-      width: min(100%, 460px); position: relative; transform: scale(0.92);
-      box-shadow: var(--shadow);
-      border: var(--border);
-    }
-    .modal-overlay.active .modal-content { animation: jelly 0.5s ease forwards; }
-    @keyframes jelly {
-      0% { transform: scale(0.88); }
-      30% { transform: scale(1.03); }
-      50% { transform: scale(0.97); }
-      70% { transform: scale(1.01); }
-      100% { transform: scale(1); }
-    }
-    .close-modal {
-      position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,.03); border: none;
-      width: 36px; height: 36px; border-radius: 12px; font-size: 1.1rem; color: #999; cursor: pointer;
-    }
-    .modal-title { color: var(--primary-color); margin-bottom: .95rem; text-align: center; font-size: 1.15rem; }
-    .payment-instructions {
-      background: rgba(154, 123, 79, 0.08); border: 1px dashed rgba(154,123,79,.45);
-      padding: 1rem; border-radius: 16px; margin-bottom: 1rem; text-align: center; font-size: .95rem;
-      line-height: 1.7;
-    }
-    .payment-instructions strong { color: var(--primary-color); font-size: 1.2rem; display: block; margin-top: 6px; }
-    .form-group { margin-bottom: .95rem; }
-    .form-group label { display: block; margin-bottom: .45rem; font-weight: 700; color: var(--text-dark); }
-    .form-group input {
-      width: 100%; padding: .9rem 1rem; border: 1px solid #e5e7eb;
-      border-radius: 14px; outline: none; background: #fff; font-size: 1rem;
-    }
-    .form-group input:focus { border-color: rgba(154,123,79,.65); box-shadow: 0 0 0 4px rgba(154,123,79,.10); }
-    .btn-submit {
-      width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--primary-color), #285f49);
-      color: var(--white); border: none; border-radius: 14px; font-weight: 800; font-size: 1.02rem; cursor: pointer; margin-top: .35rem;
-    }
-    .btn-submit:hover { filter: brightness(.97); }
-    .btn-submit:disabled { opacity: .7; cursor: not-allowed; }
+        @keyframes jelly {
+            0% { transform: scale(0.8); } 30% { transform: scale(1.05); }
+            50% { transform: scale(0.95); } 70% { transform: scale(1.02); } 100% { transform: scale(1); }
+        }
 
-    .toast-container {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 99999;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-width: min(420px, calc(100vw - 2rem));
-      pointer-events: none;
-    }
-    .custom-toast {
-      background: var(--white);
-      color: var(--text-dark);
-      padding: 1rem 1.05rem;
-      border-radius: 16px;
-      box-shadow: 0 12px 26px rgba(0,0,0,0.15);
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      font-weight: 700;
-      min-width: 280px;
-      border-right: 5px solid var(--primary-color);
-      transform: translateX(-130%);
-      transition: transform 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
-      overflow: hidden;
-      position: relative;
-      pointer-events: auto;
-    }
-    .custom-toast.show { transform: translateX(0); }
-    .custom-toast.success { border-right-color: #16a34a; }
-    .custom-toast.error { border-right-color: #dc3545; }
-    .custom-toast.info { border-right-color: var(--accent-color); }
-    .custom-toast i { font-size: 1.25rem; margin-top: .15rem; }
-    .custom-toast.success i { color: #16a34a; }
-    .custom-toast.error i { color: #dc3545; }
-    .custom-toast.info i { color: var(--accent-color); }
-    .custom-toast .toast-text { flex: 1; line-height: 1.7; }
-    .custom-toast .toast-time { font-size: .76rem; color: #98a2b3; margin-top: .2rem; }
-    .toast-progress {
-      position: absolute; bottom: 0; right: 0; left: 0; height: 3px;
-      background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
-      transform-origin: right center;
-      animation: toastProgress 4s linear forwards;
-    }
-    @keyframes toastProgress { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+        .close-modal { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; color: #999; cursor: pointer; }
+        .modal-title { color: var(--primary-color); margin-bottom: 1rem; text-align: center; }
+        
+        /* تعليمات الدفع */
+        .payment-instructions {
+            background: rgba(154, 123, 79, 0.1); border: 1px dashed var(--accent-color);
+            padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; font-size: 0.95rem;
+        }
+        .payment-instructions strong { color: var(--primary-color); font-size: 1.2rem; display: block; margin-top: 5px;}
 
-    .notification-panel {
-      position: fixed;
-      top: 78px;
-      left: 18px;
-      width: min(390px, calc(100vw - 2rem));
-      max-height: min(72vh, 640px);
-      background: rgba(255,255,255,.96);
-      border: var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      z-index: 600;
-      overflow: hidden;
-      transform: translateY(-10px) scale(.98);
-      opacity: 0;
-      visibility: hidden;
-      transition: var(--transition);
-      display: flex;
-      flex-direction: column;
-    }
-    .notification-panel.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
-    .notification-header {
-      padding: 1rem 1rem .85rem;
-      display: flex; align-items: center; justify-content: space-between; gap: .75rem;
-      border-bottom: 1px solid #eef0f2;
-    }
-    .notification-header h3 { font-size: 1.05rem; color: var(--primary-color); }
-    .notification-header .actions { display: flex; gap: .5rem; }
-    .ghost-btn {
-      border: 1px solid rgba(26,79,59,.12); background: rgba(26,79,59,.05); color: var(--primary-color);
-      border-radius: 12px; padding: .45rem .7rem; cursor: pointer; font-weight: 700;
-    }
-    .ghost-btn:hover { background: rgba(26,79,59,.10); }
-    .notification-list {
-      padding: .75rem;
-      overflow: auto;
-      display: flex;
-      flex-direction: column;
-      gap: .7rem;
-    }
-    .notification-item {
-      padding: .9rem .95rem;
-      border-radius: 16px;
-      background: #f8faf8;
-      border: 1px solid #edf1ee;
-      display: flex;
-      gap: .8rem;
-      align-items: flex-start;
-    }
-    .notification-item.unread { background: rgba(26,79,59,.06); border-color: rgba(26,79,59,.15); }
-    .notification-icon {
-      width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; flex: 0 0 auto;
-      background: rgba(26,79,59,.10); color: var(--primary-color);
-    }
-    .notification-item.success .notification-icon { background: rgba(22,163,74,.12); color: #16a34a; }
-    .notification-item.error .notification-icon { background: rgba(220,53,69,.12); color: #dc3545; }
-    .notification-item.info .notification-icon { background: rgba(154,123,79,.12); color: var(--accent-color); }
-    .notification-body { flex: 1; min-width: 0; }
-    .notification-body strong { display: block; margin-bottom: .2rem; color: var(--text-dark); }
-    .notification-body p { color: var(--text-muted); font-weight: 500; line-height: 1.7; font-size: .93rem; }
-    .notification-meta { margin-top: .35rem; font-size: .76rem; color: #98a2b3; display: flex; gap: .45rem; flex-wrap: wrap; }
-    .empty-state {
-      padding: 2rem 1rem;
-      text-align: center;
-      color: var(--text-muted);
-      line-height: 1.8;
-    }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+        .form-group input:focus { border-color: var(--accent-color); }
+        .btn-submit {
+            width: 100%; padding: 1rem; background: var(--primary-color); color: var(--white);
+            border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 1rem;
+        }
 
-    .push-banner {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      width: min(380px, calc(100vw - 2rem));
-      background: rgba(255,255,255,.96);
-      border: var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      z-index: 550;
-      padding: 1rem;
-      display: none;
-      gap: .85rem;
-      align-items: flex-start;
-    }
-    .push-banner.show { display: flex; }
-    .push-banner .icon {
-      width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center;
-      background: rgba(26,79,59,.10); color: var(--primary-color); flex: 0 0 auto;
-    }
-    .push-banner h4 { color: var(--primary-color); margin-bottom: .2rem; }
-    .push-banner p { color: var(--text-muted); line-height: 1.7; font-size: .92rem; }
-    .push-actions { display: flex; gap: .55rem; margin-top: .75rem; flex-wrap: wrap; }
-    .push-actions button {
-      border: none; border-radius: 12px; padding: .7rem .9rem; font-weight: 800; cursor: pointer;
-    }
-    .push-actions .enable { background: var(--primary-color); color: #fff; }
-    .push-actions .later { background: rgba(26,79,59,.08); color: var(--primary-color); }
+        .page-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s;
+        }
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid rgba(26, 79, 59, 0.2);
+            border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .prevent-select { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
 
-    .notice-chip {
-      display: inline-flex; align-items: center; gap: .45rem;
-      background: rgba(26,79,59,.08); color: var(--primary-color);
-      border: 1px solid rgba(26,79,59,.12); border-radius: 999px;
-      padding: .35rem .7rem; font-size: .82rem; font-weight: 700;
-    }
-
-    @media (max-width: 980px) {
-      .hero { grid-template-columns: 1fr; }
-      .viewer-content { flex-direction: column; }
-      .playlist-section { min-width: 0; border-right: 0; border-top: 1px solid #eee; }
-      .video-wrapper { min-height: 220px; }
-    }
-
-    @media (max-width: 720px) {
-      .navbar {
-        padding: .85rem .85rem;
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .brand-wrap { justify-content: flex-start; }
-      .nav-tools { justify-content: space-between; }
-      .container { width: min(100% - 1rem, 1200px); margin-top: 1rem; }
-      .courses-grid { grid-template-columns: 1fr; }
-      .hero-stats { grid-template-columns: 1fr; }
-      .notification-panel { left: 10px; top: 148px; }
-      .toast-container { left: 10px; right: 10px; bottom: 10px; max-width: none; }
-      .custom-toast { min-width: 0; width: 100%; }
-      .push-banner { right: 10px; bottom: 10px; }
-      .viewer-header { padding: .85rem .8rem; }
-      .viewer-title { font-size: 1rem; }
-      .fullscreen-btn { bottom: 10px; right: 10px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-    }
-  </style>
+        /* نظام الإشعارات الحديث المطور (Toasts) */
+        .toast-container {
+            position: fixed; bottom: 20px; left: 20px; z-index: 99999;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .custom-toast {
+            background: var(--white); color: var(--text-dark); padding: 1rem 1.5rem;
+            border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: flex; align-items: center; gap: 12px; font-weight: 700; min-width: 300px;
+            border-right: 5px solid var(--primary-color); transform: translateX(-130%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+        }
+        .custom-toast.show { transform: translateX(0); }
+        .custom-toast.success { border-right-color: #28a745; }
+        .custom-toast.error { border-right-color: #dc3545; }
+        .custom-toast.info { border-right-color: var(--accent-color); }
+        .custom-toast i { font-size: 1.4rem; }
+        .custom-toast.success i { color: #28a745; }
+        .custom-toast.error i { color: #dc3545; }
+        .custom-toast.info i { color: var(--accent-color); }
+    </style>
 </head>
 <body class="prevent-select" oncontextmenu="return false;">
-  <div class="page-loader" id="page-loader"><div class="spinner"></div></div>
-  <div class="bg-overlay"></div>
-  <div id="toast-container" class="toast-container"></div>
 
-  <div class="notification-panel" id="notification-panel" aria-hidden="true">
-    <div class="notification-header">
-      <div>
-        <h3>الإشعارات</h3>
-        <div class="notice-chip" style="margin-top:.45rem"><i class="fa-solid fa-bell"></i><span id="notification-count-label">0 جديدة</span></div>
-      </div>
-      <div class="actions">
-        <button class="ghost-btn" type="button" onclick="markAllNotificationsRead()">تحديد كمقروء</button>
-        <button class="ghost-btn" type="button" onclick="toggleNotificationPanel(false)"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-    </div>
-    <div class="notification-list" id="notification-list"></div>
-  </div>
+    <div class="page-loader" id="page-loader"><div class="spinner"></div></div>
+    <div class="bg-overlay"></div>
 
-  <div class="push-banner" id="push-banner">
-    <div class="icon"><i class="fa-solid fa-bell"></i></div>
-    <div style="flex:1; min-width:0;">
-      <h4>فعّل إشعارات المتصفح</h4>
-      <p>لتصلك تنبيهات الأدمن مباشرة عند إضافة رصيد أو نشر إشعار جديد أو تفعيل محتوى.</p>
-      <div class="push-actions">
-        <button class="enable" type="button" onclick="enableBrowserNotifications()">السماح بالإشعارات</button>
-        <button class="later" type="button" onclick="dismissPushBanner()">لاحقًا</button>
-      </div>
-    </div>
-  </div>
+    <div id="toast-container" class="toast-container"></div>
 
-  <div class="app-shell">
     <nav class="navbar">
-      <div class="brand-wrap">
-        <div class="brand-mark"><i class="fa-solid fa-graduation-cap"></i></div>
-        <div class="brand">
-          <strong>Mixtaja</strong>
-          <span>لوحة التحكم التعليمية والتحديثات اللحظية</span>
+        <div class="brand">Mixtaja</div>
+        <div class="nav-tools">
+            <div class="coins-badge">
+                <span>كاشات mix</span>
+                <span class="coins-amount" id="user-coins">0</span>
+                <button class="btn-add" onclick="openModal('topupModal')"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            
+            <div class="notification-container">
+                <button class="btn-bell" onclick="toggleNotificationDropdown(event)">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="bell-badge" id="bell-count" style="display: none;">0</span>
+                </button>
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="dropdown-header">
+                        <span>الإشعارات المستلمة</span>
+                        <button class="btn-clear-notif" id="btn-mark-all-read">تعيين كمقروء</button>
+                    </div>
+                    <div class="dropdown-body" id="notif-dropdown-body">
+                        <div class="no-notifications">لا توجد إشعارات حالياً</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-logout" onclick="logout()">تسجيل خروج</button>
         </div>
-      </div>
-
-      <div class="nav-tools">
-        <button class="btn-icon btn-bell" type="button" onclick="toggleNotificationPanel()" aria-label="الإشعارات">
-          <i class="fa-solid fa-bell"></i>
-          <span class="badge-dot" id="notification-badge" style="display:none">0</span>
-        </button>
-
-        <div class="coins-badge">
-          <span>كاشات mix</span>
-          <span class="coins-amount" id="user-coins">0</span>
-          <button class="btn-icon btn-add" type="button" onclick="openModal('topupModal')" aria-label="شحن الرصيد">
-            <i class="fa-solid fa-plus"></i>
-          </button>
-        </div>
-
-        <button class="btn-logout" type="button" onclick="logout()">تسجيل خروج</button>
-      </div>
     </nav>
 
     <main class="container">
-      <section class="hero">
-        <div class="hero-card">
-          <h1 class="hero-title">مرحبًا بك في منصة Mixtaja</h1>
-          <p class="hero-subtitle">
-            تم تحسين صفحة الطالب لتعمل بسلاسة على الهاتف والكمبيوتر، مع تشغيل الفيديو بشكل أدق، وإشعارات لحظية من الأدمن، وواجهة أكثر وضوحًا وسرعة.
-          </p>
-          <div class="hero-stats">
-            <div class="stat"><strong id="stat-courses">0</strong><span>كورسات متاحة</span></div>
-            <div class="stat"><strong id="stat-unlocked">0</strong><span>كورسات مفتوحة</span></div>
-            <div class="stat"><strong id="stat-notifications">0</strong><span>إشعارات جديدة</span></div>
-          </div>
-        </div>
-        <div class="hero-card">
-          <div class="quick-actions">
-            <button class="pill primary" type="button" onclick="openModal('topupModal')"><i class="fa-solid fa-wallet"></i> شحن الرصيد</button>
-            <button class="pill" type="button" onclick="toggleNotificationPanel()"><i class="fa-solid fa-bell"></i> عرض الإشعارات</button>
-            <button class="pill" type="button" onclick="requestPermissionFromUser()"><i class="fa-solid fa-mobile-screen-button"></i> تفعيل الإشعارات</button>
-          </div>
-        </div>
-      </section>
-
-      <h2 class="section-title">الكورسات المتاحة</h2>
-      <div class="courses-grid" id="courses-container"></div>
+        <h2 class="section-title">الكورسات المتاحة</h2>
+        <div class="courses-grid" id="courses-container"></div>
     </main>
-  </div>
 
-  <div class="course-viewer-modal" id="courseViewer">
-    <div class="viewer-header">
-      <div class="viewer-title" id="viewer-title">اسم الكورس</div>
-      <button class="btn-close-viewer" type="button" onclick="closeCourseViewer()"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <div class="viewer-content">
-      <div class="video-section" id="fullscreen-container">
-        <div class="video-wrapper">
-          <div class="yt-protection-top"></div>
-          <div class="yt-protection-center"></div>
-          <div class="yt-protection-bottom"></div>
-          <iframe
-            id="lesson-player"
-            src=""
-            title="مشغل الدرس"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-            allowfullscreen
-            referrerpolicy="strict-origin-when-cross-origin"
-          ></iframe>
+    <div class="course-viewer-modal" id="courseViewer">
+        <div class="viewer-header">
+            <div class="viewer-title" id="viewer-title">اسم الكورس</div>
+            <button class="btn-close-viewer" onclick="closeCourseViewer()"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <button class="fullscreen-btn" type="button" onclick="toggleFullScreen()"><i class="fa-solid fa-expand"></i></button>
-      </div>
-
-      <div class="playlist-section">
-        <div>
-          <h3 class="playlist-title">محتوى الكورس (الدروس)</h3>
-          <div id="playlist-container"></div>
-        </div>
-
-        <div style="margin-top: .5rem;">
-          <h3 class="playlist-title">ملحقات الكورس</h3>
-          <div class="files-list" id="files-container"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="topupModal">
-    <div class="modal-content">
-      <button class="close-modal" type="button" onclick="closeModal('topupModal')"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="modal-title">طلب شحن كاشات mix</h3>
-
-      <div class="payment-instructions">
-        يرجى تحويل المبلغ المطلوب إلى الرقم التالي:
-        <strong>01124680211</strong>
-        (فودافون كاش أو أي محفظة إلكترونية)
-      </div>
-
-      <form id="topup-form">
-        <div class="form-group">
-          <label for="amount">المبلغ المطلوب (كاش mix)</label>
-          <input type="number" id="amount" required placeholder="أدخل عدد الكاشات" min="1" />
-        </div>
-        <div class="form-group">
-          <label for="phone">الرقم المحول منه</label>
-          <input type="text" id="phone" required placeholder="أدخل رقم هاتفك" inputmode="tel" />
-        </div>
-        <div class="form-group">
-          <label for="receipt">صورة الإيصال / التحويل</label>
-          <input type="file" id="receipt" accept="image/*" required />
-        </div>
-        <button type="submit" class="btn-submit" id="btn-submit-topup">إرسال الطلب</button>
-      </form>
-    </div>
-  </div>
-
-  <script>
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
-      if (id === 'topupModal') document.getElementById('topup-form').reset();
-    }
-
-    document.addEventListener('click', (event) => {
-      const overlay = event.target.classList && event.target.classList.contains('modal-overlay');
-      if (overlay) event.target.classList.remove('active');
-      if (!event.target.closest('.notification-panel') && !event.target.closest('.btn-bell')) {
-        // لا نغلقها هنا دائمًا حتى لا تزعج المستخدم؛ الإغلاق يدوي.
-      }
-    });
-
-    function toggleFullScreen() {
-      const container = document.getElementById('fullscreen-container');
-      const icon = document.querySelector('.fullscreen-btn i');
-
-      if (!document.fullscreenElement) {
-        const req = container.requestFullscreen || container.webkitRequestFullscreen || container.msRequestFullscreen;
-        if (req) req.call(container);
-        icon.classList.remove('fa-expand');
-        icon.classList.add('fa-compress');
-      } else {
-        const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
-        if (exit) exit.call(document);
-        icon.classList.remove('fa-compress');
-        icon.classList.add('fa-expand');
-      }
-    }
-
-    window.showToast = (message, type = 'success') => {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = `custom-toast ${type}`;
-
-      let icon = 'fa-circle-check';
-      if (type === 'error') icon = 'fa-circle-xmark';
-      if (type === 'info') icon = 'fa-circle-info';
-
-      const now = new Date();
-      const timeText = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-
-      toast.innerHTML = `
-        <i class="fa-solid ${icon}"></i>
-        <div class="toast-text">
-          <div>${message}</div>
-          <div class="toast-time">${timeText}</div>
-        </div>
-        <div class="toast-progress"></div>
-      `;
-      container.appendChild(toast);
-      setTimeout(() => toast.classList.add('show'), 50);
-      setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 380);
-      }, 4000);
-    };
-  </script>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import {
-      getFirestore, doc, collection, onSnapshot, setDoc, updateDoc,
-      arrayUnion, increment, query, orderBy, limit, serverTimestamp, addDoc, where, getDocs
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCv0C8nEmkov22ZM1vVtgbagQnMnQbvB24",
-      authDomain: "mixtaja-45134.firebaseapp.com",
-      projectId: "mixtaja-45134",
-      storageBucket: "mixtaja-45134.firebasestorage.app",
-      messagingSenderId: "483029414968",
-      appId: "1:483029414968:web:12dda1c2c61b199916a2cd"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let messaging = null;
-    let currentUser = null;
-    let userMixCash = 0;
-    let unlockedCourses = [];
-    let allLiveCourses = [];
-    let notificationDocs = [];
-    let unreadCount = 0;
-    let pushBannerDismissed = false;
-    const seenNotificationIds = new Set(JSON.parse(localStorage.getItem('mixtaja_seen_notifications') || '[]'));
-
-    const notificationPanel = document.getElementById('notification-panel');
-    const notificationList = document.getElementById('notification-list');
-    const notificationBadge = document.getElementById('notification-badge');
-    const notificationCountLabel = document.getElementById('notification-count-label');
-    const pushBanner = document.getElementById('push-banner');
-
-    function getYouTubeId(input) {
-      if (!input) return '';
-      const raw = String(input).trim();
-      if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) return raw;
-
-      try {
-        const url = new URL(raw.startsWith('http') ? raw : `https://${raw}`);
-        const host = url.hostname.replace(/^www\./, '');
-
-        if (host === 'youtu.be') {
-          return url.pathname.split('/').filter(Boolean)[0] || '';
-        }
-
-        if (host.includes('youtube.com')) {
-          const v = url.searchParams.get('v');
-          if (v) return v;
-          const parts = url.pathname.split('/').filter(Boolean);
-          const embedIndex = parts.indexOf('embed');
-          if (embedIndex !== -1 && parts[embedIndex + 1]) return parts[embedIndex + 1];
-          const shortsIndex = parts.indexOf('shorts');
-          if (shortsIndex !== -1 && parts[shortsIndex + 1]) return parts[shortsIndex + 1];
-        }
-      } catch (e) {}
-
-      const match = raw.match(/([a-zA-Z0-9_-]{11})/);
-      return match ? match[1] : raw;
-    }
-
-    function buildEmbedUrl(videoInput) {
-      const id = getYouTubeId(videoInput);
-      if (!id) return '';
-      const params = new URLSearchParams({
-        autoplay: '1',
-        controls: '1',
-        modestbranding: '1',
-        rel: '0',
-        disablekb: '0',
-        playsinline: '1',
-        origin: window.location.origin
-      });
-      return `https://www.youtube.com/embed/${encodeURIComponent(id)}?${params.toString()}`;
-    }
-
-    function formatTime(value) {
-      if (!value) return 'الآن';
-      try {
-        const d = value.toDate ? value.toDate() : new Date(value);
-        return d.toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
-      } catch (e) {
-        return 'الآن';
-      }
-    }
-
-    function notificationIcon(type) {
-      if (type === 'success') return 'fa-circle-check';
-      if (type === 'error') return 'fa-triangle-exclamation';
-      if (type === 'warning') return 'fa-circle-exclamation';
-      return 'fa-circle-info';
-    }
-
-    function markNotificationSeen(id) {
-      seenNotificationIds.add(id);
-      localStorage.setItem('mixtaja_seen_notifications', JSON.stringify([...seenNotificationIds].slice(-200)));
-    }
-
-    function updateNotificationBadge() {
-      unreadCount = notificationDocs.filter(n => !seenNotificationIds.has(n.id)).length;
-      document.getElementById('stat-notifications').textContent = unreadCount;
-      notificationCountLabel.textContent = `${unreadCount} جديدة`;
-      if (unreadCount > 0) {
-        notificationBadge.style.display = 'grid';
-        notificationBadge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
-      } else {
-        notificationBadge.style.display = 'none';
-      }
-    }
-
-    function renderNotifications() {
-      notificationList.innerHTML = '';
-      const filtered = notificationDocs.slice(0, 20);
-      if (filtered.length === 0) {
-        notificationList.innerHTML = `
-          <div class="empty-state">
-            <i class="fa-regular fa-bell" style="font-size:2rem; margin-bottom:.6rem;"></i>
-            <div>لا توجد إشعارات حالياً</div>
-            <div style="font-size:.9rem; margin-top:.3rem;">أي تنبيه جديد من الأدمن سيظهر هنا فورًا.</div>
-          </div>`;
-        updateNotificationBadge();
-        return;
-      }
-
-      filtered.forEach((n) => {
-        const isUnread = !seenNotificationIds.has(n.id);
-        const item = document.createElement('div');
-        item.className = `notification-item ${n.type || 'info'} ${isUnread ? 'unread' : ''}`;
-        item.innerHTML = `
-          <div class="notification-icon"><i class="fa-solid ${notificationIcon(n.type)}"></i></div>
-          <div class="notification-body">
-            <strong>${n.title || 'إشعار جديد'}</strong>
-            <p>${n.body || ''}</p>
-            <div class="notification-meta">
-              <span><i class="fa-regular fa-clock"></i> ${formatTime(n.createdAt)}</span>
-              ${n.scope ? `<span><i class="fa-solid fa-filter"></i> ${n.scope}</span>` : ''}
+        <div class="viewer-content">
+            <div class="video-section" id="fullscreen-container">
+                <div class="video-wrapper">
+                    <div class="yt-protection-top"></div>
+                    <div class="yt-protection-center"></div>
+                    <div class="yt-protection-bottom"></div>
+                    
+                    <iframe id="lesson-player" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <button class="fullscreen-btn" onclick="toggleFullScreen()"><i class="fa-solid fa-expand"></i></button>
             </div>
-          </div>
-        `;
-        item.addEventListener('click', () => {
-          markNotificationSeen(n.id);
-          renderNotifications();
-        });
-        notificationList.appendChild(item);
-      });
-
-      updateNotificationBadge();
-    }
-
-    window.toggleNotificationPanel = (force) => {
-      const shouldOpen = typeof force === 'boolean' ? force : !notificationPanel.classList.contains('active');
-      notificationPanel.classList.toggle('active', shouldOpen);
-      notificationPanel.setAttribute('aria-hidden', String(!shouldOpen));
-      if (shouldOpen) {
-        notificationDocs.forEach(n => markNotificationSeen(n.id));
-        renderNotifications();
-      }
-    };
-
-    window.markAllNotificationsRead = () => {
-      notificationDocs.forEach(n => markNotificationSeen(n.id));
-      renderNotifications();
-      showToast('تم تحديد الإشعارات كمقروءة.', 'info');
-    };
-
-    function showBrowserNotification(title, body, type = 'info') {
-      if (!('Notification' in window) || Notification.permission !== 'granted') return;
-      try {
-        const icon = type === 'success'
-          ? 'https://cdn-icons-png.flaticon.com/512/190/190411.png'
-          : 'https://cdn-icons-png.flaticon.com/512/1827/1827392.png';
-        new Notification(title, { body, icon, badge: icon });
-      } catch (e) {}
-    }
-
-    function maybeShowPushBanner() {
-      const permission = 'Notification' in window ? Notification.permission : 'unsupported';
-      const dismissed = localStorage.getItem('mixtaja_push_dismissed') === '1';
-      pushBannerDismissed = dismissed;
-      if (permission === 'default' && !dismissed) pushBanner.classList.add('show');
-      else pushBanner.classList.remove('show');
-    }
-
-    window.dismissPushBanner = () => {
-      localStorage.setItem('mixtaja_push_dismissed', '1');
-      pushBanner.classList.remove('show');
-      pushBannerDismissed = true;
-    };
-
-    window.requestPermissionFromUser = async () => {
-      await enableBrowserNotifications();
-    };
-
-    window.enableBrowserNotifications = async () => {
-      if (!('Notification' in window)) {
-        showToast('هذا المتصفح لا يدعم إشعارات المتصفح.', 'error');
-        return;
-      }
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          showToast('تم تفعيل إشعارات المتصفح بنجاح.', 'success');
-          pushBanner.classList.remove('show');
-          if (currentUser) await initMessagingToken();
-        } else {
-          showToast('لم يتم السماح بالإشعارات.', 'info');
-        }
-      } catch (e) {
-        showToast('تعذر طلب إذن الإشعارات حالياً.', 'error');
-      }
-    };
-
-    async function initMessagingToken() {
-      try {
-        const supported = await isSupported();
-        if (!supported) return;
-        if (!messaging) messaging = getMessaging(app);
-        const vapidKey = 'PASTE_YOUR_PUBLIC_VAPID_KEY_HERE';
-        if (!vapidKey || vapidKey.includes('PASTE_YOUR_PUBLIC_VAPID_KEY_HERE')) return;
-        const token = await getToken(messaging, { vapidKey });
-        if (token && currentUser) {
-          await setDoc(doc(db, 'users', currentUser.uid), { fcmToken: token, pushEnabled: true }, { merge: true });
-        }
-      } catch (e) {
-        console.warn('FCM token init skipped:', e);
-      }
-    }
-
-    async function setupForegroundMessaging() {
-      try {
-        const supported = await isSupported();
-        if (!supported) return;
-        if (!messaging) messaging = getMessaging(app);
-        onMessage(messaging, (payload) => {
-          const title = payload?.notification?.title || 'إشعار جديد';
-          const body = payload?.notification?.body || 'لديك تنبيه جديد.';
-          showBrowserNotification(title, body, 'info');
-          showToast(title, 'info');
-          const notification = {
-            id: `fcm_${Date.now()}`,
-            title,
-            body,
-            type: 'info',
-            createdAt: new Date(),
-            scope: 'FCM'
-          };
-          notificationDocs = [notification, ...notificationDocs].slice(0, 20);
-          renderNotifications();
-        });
-      } catch (e) {
-        console.warn('Foreground messaging unavailable:', e);
-      }
-    }
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = 'index.html';
-        return;
-      }
-
-      currentUser = user;
-      await setupForegroundMessaging();
-      maybeShowPushBanner();
-      if ('Notification' in window && Notification.permission === 'granted') {
-        await initMessagingToken();
-      }
-
-      const userRef = doc(db, 'users', user.uid);
-      onSnapshot(userRef, async (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          userMixCash = data.mixCash || 0;
-          unlockedCourses = data.unlockedCourses || [];
-          document.getElementById('user-coins').innerText = userMixCash;
-          document.getElementById('stat-unlocked').textContent = unlockedCourses.length;
-          renderCourses();
-          hideLoader();
-        } else {
-          await setDoc(userRef, { email: user.email, mixCash: 0, unlockedCourses: [] }, { merge: true });
-        }
-      }, (err) => {
-        console.error(err);
-        hideLoader();
-      });
-
-      listenToCoursesLive();
-      listenToNotificationsLive();
-    });
-
-    function hideLoader() {
-      const loader = document.getElementById('page-loader');
-      loader.style.opacity = '0';
-      loader.style.visibility = 'hidden';
-      setTimeout(() => loader.style.display = 'none', 450);
-    }
-
-    function listenToCoursesLive() {
-      onSnapshot(collection(db, 'courses'), (snapshot) => {
-        allLiveCourses = [];
-        snapshot.forEach((courseDoc) => {
-          const courseData = courseDoc.data();
-          courseData.id = courseDoc.id;
-          allLiveCourses.push(courseData);
-        });
-        document.getElementById('stat-courses').textContent = allLiveCourses.length;
-        renderCourses();
-      }, (err) => {
-        console.error('courses snapshot error', err);
-      });
-    }
-
-    function listenToNotificationsLive() {
-      const q = query(collection(db, 'notifications'), orderBy('createdAt', 'desc'), limit(30));
-      onSnapshot(q, (snapshot) => {
-        const next = [];
-        snapshot.forEach((d) => {
-          const data = d.data();
-          const audience = data.audience || 'all';
-          const targetUid = data.targetUid || null;
-          const visible = audience === 'all' || (targetUid && targetUid === currentUser?.uid) || (!targetUid && audience !== 'admins');
-          if (!visible) return;
-          next.push({ id: d.id, ...data });
-        });
-
-        const previousIds = new Set(notificationDocs.map(n => n.id));
-        notificationDocs = next;
-        renderNotifications();
-
-        next.forEach((n) => {
-          if (!previousIds.has(n.id) && !seenNotificationIds.has(n.id)) {
-            showToast(n.title || 'إشعار جديد', n.type || 'info');
-            showBrowserNotification(n.title || 'إشعار جديد', n.body || '', n.type || 'info');
-          }
-        });
-      }, (err) => {
-        console.error('notifications snapshot error', err);
-      });
-    }
-
-    function renderCourses() {
-      const container = document.getElementById('courses-container');
-      container.innerHTML = '';
-
-      if (allLiveCourses.length === 0) {
-        container.innerHTML = `
-          <div style="grid-column:1/-1; text-align:center; padding:3rem 1rem; color:#888; font-weight:700; background:rgba(255,255,255,.8); border-radius:20px; border:1px dashed rgba(0,0,0,.08)">
-            لا توجد كورسات متاحة على المنصة حالياً.
-          </div>`;
-        return;
-      }
-
-      allLiveCourses.forEach(course => {
-        const isUnlocked = unlockedCourses.includes(course.id);
-
-        let actionButton = '';
-        let lockOverlay = '';
-        const lessonsCount = Array.isArray(course.lessons) ? course.lessons.length : (course.lessonsCount || 0);
-        const price = Number(course.price || 0);
-
-        if (isUnlocked) {
-          actionButton = `<button class="btn-action btn-open" type="button" onclick="window.openCourse('${course.id}')">فتح الكورس والمشاهدة</button>`;
-        } else {
-          lockOverlay = `
-            <div class="locked-overlay">
-              <i class="fa-solid fa-lock"></i>
-              <span>مقفول</span>
-            </div>`;
-          actionButton = `<button class="btn-action btn-buy" type="button" onclick="window.buyCourse('${course.id}', ${price})">شراء بـ ${price} كاش mix</button>`;
-        }
-
-        const cardHTML = `
-          <div class="course-card">
-            <div class="course-thumbnail">
-              ${lockOverlay}
-              <i class="fa-solid fa-laptop-code"></i>
+            
+            <div class="playlist-section">
+                <div>
+                    <h3 class="playlist-title">محتوى الكورس (الدروس)</h3>
+                    <div id="playlist-container"></div>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h3 class="playlist-title">ملحقات الكورس</h3>
+                    <div class="files-list" id="files-container"></div>
+                </div>
             </div>
-            <div class="course-info">
-              <h3 class="course-title">${course.title || 'كورس بدون عنوان'}</h3>
-              <div class="course-meta"><i class="fa-solid fa-list-ul"></i> ${lessonsCount} دروس</div>
-              ${!isUnlocked ? `<div class="course-price">السعر: ${price} كاش</div>` : '<div class="course-price" style="color:#1a4f3b">تم الشراء بنجاح <i class="fa-solid fa-check"></i></div>'}
-              ${actionButton}
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="topupModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('topupModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="modal-title">طلب شحن كاشات mix</h3>
+            
+            <div class="payment-instructions">
+                يرجى تحويل المبلغ المطلوب إلى الرقم التالي:
+                <strong>01124680211</strong>
+                (فودافون كاش أو أي محفظة إلكترونية)
             </div>
-          </div>`;
-        container.innerHTML += cardHTML;
-      });
-    }
 
-    window.buyCourse = async (courseId, price) => {
-      if (!currentUser) return;
-      if (userMixCash < price) {
-        showToast('عفواً، رصيدك من كاشات mix غير كافٍ للاشتراك. يرجى الشحن أولاً! ❌', 'error');
-        return;
-      }
+            <form id="topup-form">
+                <div class="form-group">
+                    <label for="amount">المبلغ المطلوب (كاش mix)</label>
+                    <input type="number" id="amount" required placeholder="أدخل عدد الكاشات">
+                </div>
+                <div class="form-group">
+                    <label for="phone">الرقم المحول منه</label>
+                    <input type="text" id="phone" required placeholder="أدخل رقم هاتفك">
+                </div>
+                <div class="form-group">
+                    <label for="receipt">صورة الإيصال / التحويل</label>
+                    <input type="file" id="receipt" accept="image/*" required>
+                </div>
+                <button type="submit" class="btn-submit" id="btn-submit-topup">إرسال الطلب</button>
+            </form>
+        </div>
+    </div>
 
-      const confirmBuy = confirm(`هل أنت متأكد من شراء هذا الكورس واقتطاع ${price} كاش من رصيدك؟`);
-      if (!confirmBuy) return;
-
-      try {
-        const userRef = doc(db, 'users', currentUser.uid);
-        await updateDoc(userRef, {
-          mixCash: increment(-price),
-          unlockedCourses: arrayUnion(courseId)
+    <script>
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { 
+            document.getElementById(id).classList.remove('active'); 
+            if(id === 'topupModal') document.getElementById('topup-form').reset();
+        }
+        
+        // إغلاق النوافذ عند النقر خارجها
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.remove('active');
+            }
+            const dropdown = document.getElementById('notificationDropdown');
+            if (!event.target.closest('.notification-container') && dropdown.classList.contains('active')) {
+                dropdown.classList.remove('active');
+            }
         });
-        await addDoc(collection(db, 'notifications'), {
-          audience: 'user',
-          targetUid: currentUser.uid,
-          type: 'success',
-          title: 'تم شراء الكورس',
-          body: `تم تفعيل الكورس بنجاح وخصم ${price} كاش من رصيدك.`,
-          createdAt: serverTimestamp(),
-          scope: 'purchase'
-        });
-        showToast('تهانينا! تم شراء الكورس بنجاح وتفعيل المحتوى. 🎉', 'success');
-      } catch (error) {
-        console.error('Error buying course:', error);
-        showToast('عفواً، فشلت عملية الشراء. حاول مرة أخرى لاحقاً.', 'error');
-      }
-    };
 
-    window.openCourse = (courseId) => {
-      const course = allLiveCourses.find(c => c.id === courseId);
-      if (!course) return;
-
-      document.getElementById('viewer-title').innerText = course.title || 'الكورس';
-
-      const playlistContainer = document.getElementById('playlist-container');
-      playlistContainer.innerHTML = '';
-
-      const lessons = Array.isArray(course.lessons) ? course.lessons : [];
-      if (lessons.length > 0) {
-        lessons.forEach((lesson, index) => {
-          const isActive = index === 0 ? 'active' : '';
-          const title = lesson.title || `الدرس ${index + 1}`;
-          playlistContainer.innerHTML += `
-            <div class="lesson-item ${isActive}" onclick="window.playLesson('${lesson.videoId || ''}', this)">
-              <i class="fa-solid fa-circle-play"></i>
-              <span>${title}</span>
-            </div>`;
-        });
-      } else {
-        playlistContainer.innerHTML = '<span style="color:#999; font-size:0.95rem;">لا توجد دروس مرفوعة في هذا الكورس بعد.</span>';
-      }
-
-      const filesContainer = document.getElementById('files-container');
-      filesContainer.innerHTML = '';
-      const files = Array.isArray(course.files) ? course.files : [];
-      if (files.length > 0) {
-        files.forEach(file => {
-          filesContainer.innerHTML += `
-            <a href="${file.link || '#'}" target="_blank" class="file-link" rel="noopener noreferrer">
-              <i class="fa-solid fa-file-arrow-down"></i> ${file.name || 'ملف'}
-            </a>`;
-        });
-      } else {
-        filesContainer.innerHTML = '<span style="color:#999; font-size:0.95rem;">لا توجد ملفات أو ملخصات ملحقة حالياً.</span>';
-      }
-
-      if (lessons.length > 0) {
-        setIframeSource(lessons[0].videoId || '');
-      } else {
-        document.getElementById('lesson-player').src = '';
-      }
-
-      document.getElementById('courseViewer').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    };
-
-    window.playLesson = (videoId, element) => {
-      document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
-      if (element) element.classList.add('active');
-      setIframeSource(videoId);
-    };
-
-    function setIframeSource(videoId) {
-      const iframe = document.getElementById('lesson-player');
-      const src = buildEmbedUrl(videoId);
-      if (!src) {
-        iframe.src = '';
-        showToast('رابط الفيديو غير صالح أو غير مكتمل.', 'error');
-        return;
-      }
-      iframe.src = src;
-    }
-
-    window.closeCourseViewer = () => {
-      document.getElementById('courseViewer').classList.remove('active');
-      document.body.style.overflow = 'auto';
-      document.getElementById('lesson-player').src = '';
-    };
-
-    window.logout = () => {
-      signOut(auth).then(() => window.location.href = 'index.html');
-    };
-
-    document.getElementById('topup-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('btn-submit-topup');
-      btn.innerText = 'جاري إرسال الطلب...';
-      btn.disabled = true;
-
-      const amount = document.getElementById('amount').value;
-      const phone = document.getElementById('phone').value;
-      const fileInput = document.getElementById('receipt');
-
-      const botToken = 'PASTE_TELEGRAM_BOT_TOKEN_HERE';
-      const chatId = 'PASTE_TELEGRAM_CHAT_ID_HERE';
-
-      const caption = `🔥 طلب شحن جديد!\n\n👤 المستخدم: ${currentUser?.email || 'unknown'}\n💰 المبلغ المطلوب: ${amount} كاش mix\n📱 رقم التحويل: ${phone}`;
-
-      try {
-        if (!fileInput.files.length) {
-          showToast('من فضلك أرفق صورة الإيصال أولاً.', 'error');
-          return;
+        // فتح وإغلاق قائمة الإشعارات المنسدلة
+        function toggleNotificationDropdown(event) {
+            event.stopPropagation();
+            document.getElementById('notificationDropdown').classList.toggle('active');
         }
 
-        if (!botToken || botToken.includes('PASTE_TELEGRAM_BOT_TOKEN_HERE') || !chatId || chatId.includes('PASTE_TELEGRAM_CHAT_ID_HERE')) {
-          showToast('يرجى ضبط توكن تيليجرام و chat_id داخل الملف.', 'error');
-          return;
+        // كود ملء الشاشة المخصص لحاوية الفيديو
+        function toggleFullScreen() {
+            const container = document.getElementById("fullscreen-container");
+            const icon = document.querySelector('.fullscreen-btn i');
+            
+            if (!document.fullscreenElement) {
+                if (container.requestFullscreen) { container.requestFullscreen(); }
+                else if (container.webkitRequestFullscreen) { container.webkitRequestFullscreen(); }
+                else if (container.msRequestFullscreen) { container.msRequestFullscreen(); }
+                icon.classList.remove('fa-expand');
+                icon.classList.add('fa-compress');
+            } else {
+                if (document.exitFullscreen) { document.exitFullscreen(); }
+                else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+                else if (document.msExitFullscreen) { document.msExitFullscreen(); }
+                icon.classList.remove('fa-compress');
+                icon.classList.add('fa-expand');
+            }
         }
 
-        const formData = new FormData();
-        formData.append('chat_id', chatId);
-        formData.append('caption', caption);
-        formData.append('photo', fileInput.files[0]);
+        // دالة إظهار الإشعارات المخصصة المحدثة
+        window.showToast = (message, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${type}`;
+            
+            let icon = 'fa-circle-check';
+            if (type === 'error') icon = 'fa-circle-xmark';
+            if (type === 'info') icon = 'fa-circle-info';
+            
+            toast.innerHTML = `
+                <i class="fa-solid ${icon}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        };
+    </script>
 
-        const response = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
-          method: 'POST',
-          body: formData
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, collection, onSnapshot, setDoc, updateDoc, arrayUnion, increment, query, orderBy, limit, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyCv0C8nEmkov22ZM1vVtgbagQnMnQbvB24",
+          authDomain: "mixtaja-45134.firebaseapp.com",
+          projectId: "mixtaja-45134",
+          storageBucket: "mixtaja-45134.firebasestorage.app",
+          messagingSenderId: "483029414968",
+          appId: "1:483029414968:web:12dda1c2c61b199916a2cd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        let currentUser = null;
+        let userMixCash = 0;
+        let unlockedCourses = [];
+        let allLiveCourses = [];
+        let localNotifications = [];
+
+        // طلب إذن وصول إشعارات جوجل من المتصفح لربطها بلوحة التحكم
+        async function requestBrowserNotificationPermission() {
+            if (!("Notification" in window)) return;
+            if (Notification.permission === "default") {
+                await Notification.requestPermission();
+            }
+        }
+
+        // إطلاق إشعار نظام حقيقي على الجهاز
+        function triggerSystemNotification(title, body) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(title, {
+                    body: body,
+                    icon: 'logo1.png',
+                    dir: 'rtl'
+                });
+            }
+        }
+
+        // 1. مراقبة حالة تسجيل دخول الطالب ومزامنة الإشعارات والبيانات المالية
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+            } else {
+                currentUser = user;
+                requestBrowserNotificationPermission();
+                
+                const userRef = doc(db, "users", user.uid);
+                onSnapshot(userRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        userMixCash = data.mixCash || 0;
+                        unlockedCourses = data.unlockedCourses || [];
+                        document.getElementById('user-coins').innerText = userMixCash;
+                        
+                        renderCourses();
+                        
+                        document.getElementById('page-loader').style.opacity = '0';
+                        setTimeout(() => document.getElementById('page-loader').style.display = 'none', 500);
+                    } else {
+                        setDoc(userRef, { email: user.email, mixCash: 0, unlockedCourses: [] }, { merge: true });
+                    }
+                });
+
+                // تفعيل الاستماع اللحظي للكورسات والإشعارات الخاصة بالكامل
+                listenToCoursesLive();
+                listenToNotificationsLive(user.uid);
+            }
         });
 
-        if (response.ok) {
-          closeModal('topupModal');
-          showToast('تم استلام طلب الشحن بنجاح! سيتم المراجعة وإضافة الرصيد قريباً. ⏳', 'info');
-          await addDoc(collection(db, 'notifications'), {
-            audience: 'user',
-            targetUid: currentUser.uid,
-            type: 'info',
-            title: 'تم استلام طلب الشحن',
-            body: `تم استلام طلب شحن بقيمة ${amount} كاش mix وجارٍ مراجعته.`,
-            createdAt: serverTimestamp(),
-            scope: 'topup'
-          });
-        } else {
-          showToast('حدث خطأ أثناء إرسال الطلب، حاول مرة أخرى.', 'error');
+        // 2. جلب وتحديث قائمة الكورسات بالوقت الفعلي من الـ Firestore
+        function listenToCoursesLive() {
+            onSnapshot(collection(db, "courses"), (snapshot) => {
+                allLiveCourses = [];
+                snapshot.forEach((courseDoc) => {
+                    const courseData = courseDoc.data();
+                    courseData.id = courseDoc.id;
+                    allLiveCourses.push(courseData);
+                });
+                renderCourses();
+            });
         }
-      } catch (error) {
-        console.error(error);
-        showToast('فشل الاتصال بالخادم، تحقق من اتصالك بالإنترنت.', 'error');
-      } finally {
-        btn.innerText = 'إرسال الطلب';
-        btn.disabled = false;
-      }
-    });
 
-    function registerServiceWorker() {
-      if (!('serviceWorker' in navigator)) return;
-      navigator.serviceWorker.register('./firebase-messaging-sw.js').catch(err => {
-        console.warn('SW registration skipped:', err);
-      });
-    }
+        // 3. نظام متطور للاستماع اللحظي للإشعارات المرسلة من الأدمن لكل طالب
+        function listenToNotificationsLive(uid) {
+            const notifRef = collection(db, "users", uid, "notifications");
+            const q = query(notifRef, orderBy("createdAt", "desc"), limit(20));
+            
+            let isFirstLoad = true;
 
-    registerServiceWorker();
-    maybeShowPushBanner();
-  </script>
+            onSnapshot(q, (snapshot) => {
+                localNotifications = [];
+                let unreadCount = 0;
+
+                snapshot.forEach((doc) => {
+                    const notif = doc.data();
+                    notif.id = doc.id;
+                    localNotifications.push(notif);
+                    if (!notif.read) {
+                        unreadCount++;
+                    }
+                });
+
+                // تحديث عداد الجرس العلوي
+                const badge = document.getElementById('bell-count');
+                if (unreadCount > 0) {
+                    badge.innerText = unreadCount;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                // عرض الإشعار المنبثق وإشعار النظام فقط عند وصول إشعار جديد حقيقي وليس عند التحميل الأول للملف
+                if (!isFirstLoad && snapshot.docChanges().some(change => change.type === "added")) {
+                    const newChange = snapshot.docChanges().find(change => change.type === "added");
+                    if(newChange) {
+                        const newNotif = newChange.doc.data();
+                        window.showToast(`${newNotif.title}: ${newNotif.body}`, "info");
+                        triggerSystemNotification(newNotif.title, newNotif.body);
+                    }
+                }
+
+                isFirstLoad = false;
+                renderNotificationsDropdown();
+            });
+        }
+
+        // بناء قائمة الإشعارات داخل الصندوق المنسدلة
+        function renderNotificationsDropdown() {
+            const container = document.getElementById('notif-dropdown-body');
+            container.innerHTML = '';
+
+            if (localNotifications.length === 0) {
+                container.innerHTML = '<div class="no-notifications">لا توجد إشعارات حالياً</div>';
+                return;
+            }
+
+            localNotifications.forEach(notif => {
+                const date = notif.createdAt ? new Date(notif.createdAt.seconds * 1000).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'}) : '';
+                const unreadClass = notif.read ? '' : 'unread';
+                
+                container.innerHTML += `
+                    <div class="notification-item ${unreadClass}">
+                        <span class="notif-title">${notif.title}</span>
+                        <span class="notif-body">${notif.body}</span>
+                        <span class="notif-time">${date}</span>
+                    </div>
+                `;
+            });
+        }
+
+        // تحويل كافة الإشعارات المستلمة إلى مقروءة عند النقر على الزر
+        document.getElementById('btn-mark-all-read').addEventListener('click', async () => {
+            if (!currentUser || localNotifications.length === 0) return;
+            const batch = writeBatch(db);
+            
+            localNotifications.forEach(notif => {
+                if(!notif.read) {
+                    const docRef = doc(db, "users", currentUser.uid, "notifications", notif.id);
+                    batch.update(docRef, { read: true });
+                }
+            });
+            
+            try {
+                await batch.commit();
+            } catch (err) {
+                console.error("Error setting notification status: ", err);
+            }
+        });
+
+        // 4. رسم وبناء بطاقات الكورسات الحية ديناميكياً داخل الواجهة
+        function renderCourses() {
+            const container = document.getElementById('courses-container');
+            container.innerHTML = '';
+
+            if (allLiveCourses.length === 0) {
+                container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:#888; font-weight:bold;">لا توجد كورسات متاحة على المنصة حالياً.</div>';
+                return;
+            }
+
+            allLiveCourses.forEach(course => {
+                const isUnlocked = unlockedCourses.includes(course.id);
+                
+                let actionButton = '';
+                let lockOverlay = '';
+
+                if (isUnlocked) {
+                    actionButton = `<button class="btn-action btn-open" onclick="window.openCourse('${course.id}')">فتح الكورس والمشاهدة</button>`;
+                } else {
+                    lockOverlay = `
+                        <div class="locked-overlay">
+                            <i class="fa-solid fa-lock"></i>
+                            <span>مقفول</span>
+                        </div>
+                    `;
+                    actionButton = `<button class="btn-action btn-buy" onclick="window.buyCourse('${course.id}', ${course.price})">شراء بـ ${course.price} كاش mix</button>`;
+                }
+
+                const cardHTML = `
+                    <div class="course-card">
+                        <div class="course-thumbnail">
+                            ${lockOverlay}
+                            <i class="fa-solid fa-laptop-code"></i>
+                        </div>
+                        <div class="course-info">
+                            <h3 class="course-title">${course.title}</h3>
+                            <div class="course-meta"><i class="fa-solid fa-list-ul"></i> ${course.lessonsCount || 0} دروس</div>
+                            ${!isUnlocked ? `<div class="course-price">السعر: ${course.price} كاش</div>` : '<div class="course-price" style="color:#1a4f3b">تم الشراء بنجاح <i class="fa-solid fa-check"></i></div>'}
+                            ${actionButton}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        // 5. دالة شراء الكورس وخصم الكاشات بنظام الإشعارات المطور
+        window.buyCourse = async (courseId, price) => {
+            if (userMixCash >= price) {
+                const confirmBuy = confirm(`هل أنت متأكد من رغبتك في شراء هذا الكورس واقتطاع ${price} كاش من رصيدك؟`);
+                if(confirmBuy){
+                    try {
+                        const userRef = doc(db, "users", currentUser.uid);
+                        await updateDoc(userRef, {
+                            mixCash: increment(-price),
+                            unlockedCourses: arrayUnion(courseId)
+                        });
+                        window.showToast("تهانينا! تم شراء الكورس بنجاح وتفعيل المحتوى. 🎉", "success");
+                    } catch (error) {
+                        console.error("Error buying course:", error);
+                        window.showToast("عفواً، فشلت عملية الشراء. حاول مرة أخرى لاحقاً.", "error");
+                    }
+                }
+            } else {
+                window.showToast("عفواً، رصيدك من كاشات mix غير كافٍ للاشتراك. يرجى الشحن أولاً! ❌", "error");
+            }
+        };
+
+        // 6. فتح واجهة عرض محتويات الكورس المشترى
+        window.openCourse = (courseId) => {
+            const course = allLiveCourses.find(c => c.id === courseId);
+            if(!course) return;
+
+            document.getElementById('viewer-title').innerText = course.title;
+            
+            const playlistContainer = document.getElementById('playlist-container');
+            playlistContainer.innerHTML = '';
+            
+            if(course.lessons && course.lessons.length > 0) {
+                course.lessons.forEach((lesson, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    playlistContainer.innerHTML += `
+                        <div class="lesson-item ${isActive}" onclick="window.playLesson('${lesson.videoId}', this)">
+                            <i class="fa-solid fa-circle-play"></i>
+                            <span>${lesson.title}</span>
+                        </div>
+                    `;
+                });
+            } else {
+                playlistContainer.innerHTML = '<span style="color:#999; font-size:0.9rem;">لا توجد دروس مرفوعة في هذا الكورس بعد.</span>';
+            }
+
+            const filesContainer = document.getElementById('files-container');
+            filesContainer.innerHTML = '';
+            if(course.files && course.files.length > 0){
+                course.files.forEach(file => {
+                    filesContainer.innerHTML += `
+                        <a href="${file.link}" target="_blank" class="file-link">
+                            <i class="fa-solid fa-file-arrow-down"></i> ${file.name}
+                        </a>
+                    `;
+                });
+            } else {
+                filesContainer.innerHTML = '<span style="color:#999; font-size:0.9rem;">لا توجد ملفات أو ملخصات ملحقة حالياً.</span>';
+            }
+
+            // تشغيل أول فيديو تلقائياً عند فتح الكورس
+            if(course.lessons && course.lessons.length > 0){
+                setIframeSource(course.lessons[0].videoId);
+            } else {
+                document.getElementById('lesson-player').src = '';
+            }
+
+            document.getElementById('courseViewer').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+
+        // تشغيل فيديو الدرس المحدد ومزامنة التنشيط
+        window.playLesson = (videoId, element) => {
+            document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            setIframeSource(videoId);
+        };
+
+        function setIframeSource(videoId) {
+            const iframe = document.getElementById('lesson-player');
+            // تم ضبط البرامترات لتعمل بسلاسة فائقة ودعم المشغل الداخلي بالكامل والتوافق مع أدوات التحكم المخصصة
+            iframe.src = `https://www.youtube.com/embed/${videoId}?controls=1&modestbranding=1&rel=0&showinfo=0&autoplay=1`;
+        }
+
+        window.closeCourseViewer = () => {
+            document.getElementById('courseViewer').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            document.getElementById('lesson-player').src = ''; 
+        };
+
+        window.logout = () => {
+            signOut(auth).then(() => window.location.href = 'index.html');
+        };
+
+        // 7. معالجة إرسال طلب الشحن المالي وإعلام المستخدم عبر الـ Toast
+        document.getElementById('topup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-topup');
+            btn.innerText = 'جاري إرسال الطلب...'; btn.disabled = true;
+
+            const amount = document.getElementById('amount').value;
+            const phone = document.getElementById('phone').value;
+            const fileInput = document.getElementById('receipt');
+            
+            const botToken = "8635550416:AAGsNM7mnjak80kQclTHdMJYKKvaiAJHNjI";
+            const chatId = "5394550159";
+
+            const caption = `🔥 طلب شحن جديد!\n\n👤 المستخدم: ${currentUser.email}\n💰 المبلغ المطلوب: ${amount} كاش mix\n📱 رقم التحويل: ${phone}`;
+
+            const formData = new FormData();
+            formData.append('chat_id', chatId);
+            formData.append('caption', caption);
+
+            if (fileInput.files.length > 0) {
+                formData.append('photo', fileInput.files[0]);
+                try {
+                    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, { method: 'POST', body: formData });
+                    if (response.ok) {
+                        closeModal('topupModal');
+                        window.showToast('تم استلام طلب الشحن بنجاح! سيتم المراجعة وإضافة الرصيد قريباً. ⏳', 'info');
+                    } else { 
+                        window.showToast("حدث خطأ غير متوقع أثناء معالجة البيانات، حاول مرة أخرى.", "error"); 
+                    }
+                } catch (error) { 
+                    window.showToast("فشل الاتصال بالخادم، تحقق من اتصالك بالإنترنت.", "error"); 
+                }
+            }
+            btn.innerText = 'إرسال الطلب'; btn.disabled = false;
+        });
+    </script>
 </body>
 </html>
