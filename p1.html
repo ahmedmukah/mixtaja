@@ -196,7 +196,7 @@
         }
         
         .video-wrapper {
-            position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden;
         }
         .video-wrapper iframe {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; border: none;
@@ -206,10 +206,10 @@
         .yt-protection-top, .yt-protection-bottom-right {
             position: absolute; z-index: 5; pointer-events: auto; background: transparent;
         }
-        /* حجب كامل لشريط العناوين العلوي وزر المشاركة */
-        .yt-protection-top { top: 0; left: 0; right: 0; height: 60px; }
-        /* حجب دقيق لزاوية شعار يوتيوب السفلي لمنع الانتقال للموقع */
-        .yt-protection-bottom-right { bottom: 0; right: 0; width: 150px; height: 55px; }
+        /* حجب كامل لشريط العناوين العلوي وزر المشاركة والمشاهدة لاحقاً */
+        .yt-protection-top { top: 0; left: 0; right: 0; height: 85px; }
+        /* حجب دقيق لزاوية شعار يوتيوب السفلي (العلامة المائية) وتجنب شريط التحكم */
+        .yt-protection-bottom-right { bottom: 40px; right: 0; width: 120px; height: 60px; }
 
         /* زر ملء الشاشة المخصص */
         .fullscreen-btn {
@@ -369,8 +369,10 @@
                     <div class="yt-protection-top"></div>
                     <div class="yt-protection-bottom-right"></div>
                     
-                    <iframe id="lesson-player" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <!-- Sandbox Attribute هو السر هنا: يمنع اليوتيوب من فتح أي روابط خارجية أو توجيه الصفحة نهائياً -->
+                    <iframe id="lesson-player" src="" sandbox="allow-scripts allow-same-origin allow-presentation" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
+                <!-- زر ملء الشاشة المخصص لأننا سنلغي زر يوتيوب الأصلي -->
                 <button class="fullscreen-btn" onclick="toggleFullScreen()"><i class="fa-solid fa-expand"></i></button>
             </div>
             
@@ -523,7 +525,6 @@
             }
         }
 
-        // 1. مراقبة حالة تسجيل دخول الطالب ومزامنة البيانات المالية والإشعارات الموحدة
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -553,7 +554,6 @@
             }
         });
 
-        // 2. جلب وتحديث قائمة الكورسات بالوقت الفعلي من الـ Firestore
         function listenToCoursesLive() {
             onSnapshot(collection(db, "courses"), (snapshot) => {
                 allLiveCourses = [];
@@ -566,7 +566,6 @@
             });
         }
 
-        // 3. نظام متطور وبدون أخطاء للاستماع اللحظي للرسائل الموحدة والخاصة المرسلة من الأدمن
         function listenToNotificationsLive(uid) {
             const q = query(collection(db, "notifications"), orderBy("createdAt", "desc"), limit(30));
             let isFirstLoad = true;
@@ -575,14 +574,12 @@
                 localNotifications = [];
                 let unreadCount = 0;
                 
-                // استدعاء سجل الإشعارات المقروءة المخزن محلياً لهذا الحساب
                 const readNotifs = JSON.parse(localStorage.getItem(`read_notifs_${uid}`)) || [];
 
                 snapshot.forEach((doc) => {
                     const notif = doc.data();
                     notif.id = doc.id;
                     
-                    // الفلترة البرمجية: التحقق مما إذا كان الإشعار موجهاً للكل أو لهذا الحساب خصيصاً
                     if (notif.userId === "all" || notif.userId === uid) {
                         notif.read = readNotifs.includes(notif.id);
                         localNotifications.push(notif);
@@ -600,7 +597,6 @@
                     badge.style.display = 'none';
                 }
 
-                // تفعيل التنبيه والـ Toast الفوري في حال تم إرسال إشعار جديد حقيقي أثناء تصفح الطالب
                 if (!isFirstLoad && snapshot.docChanges().some(change => change.type === "added")) {
                     snapshot.docChanges().forEach(change => {
                         if (change.type === "added") {
@@ -621,7 +617,6 @@
             });
         }
 
-        // بناء قائمة الإشعارات في صندوق الإشعارات المنسدلة
         function renderNotificationsDropdown() {
             const container = document.getElementById('notif-dropdown-body');
             container.innerHTML = '';
@@ -645,7 +640,6 @@
             });
         }
 
-        // تعيين كافة الإشعارات كمقروءة وحفظ معرفاتها محلياً
         document.getElementById('btn-mark-all-read').addEventListener('click', () => {
             if (!currentUser || localNotifications.length === 0) return;
             
@@ -662,7 +656,6 @@
             window.showToast("تم تعيين جميع الإشعارات كمقروءة بنجاح.", "success");
         });
 
-        // 4. بناء وعرض بطاقات الكورسات الحية ديناميكياً داخل الواجهة
         function renderCourses() {
             const container = document.getElementById('courses-container');
             container.innerHTML = '';
@@ -708,7 +701,6 @@
             });
         }
 
-        // 5. دالة شراء الكورس وخصم الكاشات
         window.buyCourse = async (courseId, price) => {
             if (userMixCash >= price) {
                 const confirmBuy = confirm(`هل أنت متأكد من رغبتك في شراء هذا الكورس واقتطاع ${price} كاش من رصيدك؟`);
@@ -730,7 +722,6 @@
             }
         };
 
-        // 6. فتح واجهة عرض محتويات الكورس المشترى وتجهيز المشغل الآمن
         window.openCourse = (courseId) => {
             const course = allLiveCourses.find(c => c.id === courseId);
             if(!course) return;
@@ -786,8 +777,8 @@
 
         function setIframeSource(videoId) {
             const iframe = document.getElementById('lesson-player');
-            // ضبط البارامترات بدقة لإلغاء الاقتراحات الخارجية والفيديوهات ذات الصلة غير التابعة للقناة
-            iframe.src = `https://www.youtube.com/embed/${videoId}?controls=1&modestbranding=1&rel=0&showinfo=0&autoplay=1&iv_load_policy=3`;
+            // استخدام دومين youtube-nocookie الخالي من التتبع + تقليل العلامات التجارية + إخفاء زر ملء الشاشة الأصلي + إجبار الواجهة باللغة العربية
+            iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?controls=1&modestbranding=1&rel=0&autoplay=1&iv_load_policy=3&fs=0&hl=ar`;
         }
 
         window.closeCourseViewer = () => {
@@ -800,7 +791,6 @@
             signOut(auth).then(() => window.location.href = 'index.html');
         };
 
-        // 7. معالجة إرسال طلب الشحن المالي عبر تليجرام وبث التنبيهات للمستخدم
         document.getElementById('topup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit-topup');
