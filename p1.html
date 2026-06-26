@@ -48,7 +48,7 @@
         }
 
         .brand { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); }
-        .nav-tools { display: flex; align-items: center; gap: 1.2rem; }
+        .nav-tools { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
 
         .coins-badge {
             background: rgba(154, 123, 79, 0.1); border: 1px solid var(--accent-color);
@@ -63,6 +63,19 @@
             display: flex; align-items: center; justify-content: center; transition: var(--transition);
         }
         .btn-add:hover { transform: scale(1.1); background: var(--primary-color); }
+
+        /* زر الإعلانات الجديد */
+        .btn-watch-ad {
+            background: linear-gradient(135deg, #f0b90b, #d4a000);
+            color: var(--white); border: none; padding: 0.5rem 1rem;
+            border-radius: 20px; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; gap: 0.6rem; transition: var(--transition);
+            font-size: 0.95rem; box-shadow: 0 4px 10px rgba(240, 185, 11, 0.3);
+        }
+        .btn-watch-ad:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(240, 185, 11, 0.5); }
+        .btn-watch-ad:disabled {
+            background: #ccc; box-shadow: none; cursor: not-allowed; transform: none;
+        }
 
         /* أيقونة وقائمة الإشعارات المتقدمة */
         .notification-container {
@@ -202,14 +215,12 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; border: none;
         }
 
-        /* حماية متطورة لمنع مغادرة الفيديو أو الضغط على خيارات المشاركة ويوتيوب (بديلاً عن الـ Sandbox لكي لا يتعطل المشغل) */
+        /* حماية متطورة لمنع مغادرة الفيديو أو الضغط على خيارات المشاركة ويوتيوب (تم تصغير الحجم لتجنب إعاقة زر التشغيل) */
         .yt-protection-top, .yt-protection-bottom-right {
             position: absolute; z-index: 5; pointer-events: auto; background: transparent; cursor: default;
         }
-        /* حجب كامل لشريط العناوين العلوي وزر المشاركة والمشاهدة لاحقاً */
-        .yt-protection-top { top: 0; left: 0; right: 0; height: 85px; }
-        /* حجب دقيق لزاوية شعار يوتيوب السفلي (العلامة المائية) وتجنب شريط التحكم */
-        .yt-protection-bottom-right { bottom: 40px; right: 0; width: 120px; height: 60px; }
+        .yt-protection-top { top: 0; left: 0; right: 0; height: 60px; }
+        .yt-protection-bottom-right { bottom: 35px; right: 0; width: 100px; height: 50px; }
 
         /* زر ملء الشاشة المخصص */
         .fullscreen-btn {
@@ -327,6 +338,12 @@
     <nav class="navbar">
         <div class="brand">Mixtaja</div>
         <div class="nav-tools">
+            
+            <!-- زر الإعلانات الجديد -->
+            <button class="btn-watch-ad" id="btn-watch-ad" onclick="watchAdForCoin()">
+                <i class="fa-solid fa-play"></i> شاهد إعلان (1 كاش)
+            </button>
+
             <div class="coins-badge">
                 <span>كاشات mix</span>
                 <span class="coins-amount" id="user-coins">0</span>
@@ -369,7 +386,7 @@
                     <div class="yt-protection-top"></div>
                     <div class="yt-protection-bottom-right"></div>
                     
-                    <!-- تم إزالة sandbox بالكامل ليعمل يوتيوب بدون خطأ Playback ID -->
+                    <!-- إطار يوتيوب المُحسن ليعمل بدون مشاكل -->
                     <iframe id="lesson-player" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
                 <!-- زر ملء الشاشة المخصص -->
@@ -508,6 +525,44 @@
         let allLiveCourses = [];
         let localNotifications = [];
 
+        // دالة تشغيل إعلان Adsterra
+        window.triggerAd = () => {
+            const adsterraDirectLink = "https://www.effectivecpmnetwork.com/suhs8vs7q7?key=f203e203f8049617fc2e0334bd676f30";
+            window.open(adsterraDirectLink, '_blank');
+        };
+
+        // دالة مشاهدة الإعلان مقابل 1 كاش
+        window.watchAdForCoin = async () => {
+            if (!currentUser) return;
+            const today = new Date().toISOString().split('T')[0];
+            let currentWatches = window.currentUserAdWatches || { count: 0, date: today };
+            
+            if (currentWatches.date !== today) {
+                currentWatches = { count: 0, date: today };
+            }
+
+            if (currentWatches.count >= 3) {
+                window.showToast("لقد استنفذت الـ 3 مشاهدات المتاحة لهذا اليوم.", "error");
+                return;
+            }
+
+            // تشغيل الإعلان
+            window.triggerAd();
+
+            try {
+                const newCount = currentWatches.count + 1;
+                const userRef = doc(db, "users", currentUser.uid);
+                await updateDoc(userRef, {
+                    mixCash: increment(1),
+                    adWatches: { count: newCount, date: today }
+                });
+                window.showToast("تم إضافة 1 كاش إلى رصيدك بنجاح!", "success");
+            } catch (error) {
+                console.error("Error adding coin:", error);
+                window.showToast("حدث خطأ أثناء التحديث.", "error");
+            }
+        };
+
         async function requestBrowserNotificationPermission() {
             if (!("Notification" in window)) return;
             if (Notification.permission === "default") {
@@ -538,6 +593,25 @@
                         const data = docSnap.data();
                         userMixCash = data.mixCash || 0;
                         unlockedCourses = data.unlockedCourses || [];
+                        
+                        // تهيئة عداد الإعلانات لليوم الحالي
+                        const today = new Date().toISOString().split('T')[0];
+                        let adWatches = data.adWatches || { count: 0, date: today };
+                        if (adWatches.date !== today) {
+                            adWatches = { count: 0, date: today };
+                        }
+                        window.currentUserAdWatches = adWatches;
+
+                        // تحديث حالة زر الإعلانات
+                        const btnWatchAd = document.getElementById('btn-watch-ad');
+                        if (adWatches.count >= 3) {
+                            btnWatchAd.innerHTML = '<i class="fa-solid fa-check-circle"></i> اكتملت مشاهدات اليوم';
+                            btnWatchAd.disabled = true;
+                        } else {
+                            btnWatchAd.innerHTML = `<i class="fa-solid fa-play"></i> شاهد إعلان (1 كاش) - متبقي ${3 - adWatches.count}`;
+                            btnWatchAd.disabled = false;
+                        }
+
                         document.getElementById('user-coins').innerText = userMixCash;
                         
                         renderCourses();
@@ -545,7 +619,7 @@
                         document.getElementById('page-loader').style.opacity = '0';
                         setTimeout(() => document.getElementById('page-loader').style.display = 'none', 500);
                     } else {
-                        setDoc(userRef, { email: user.email, mixCash: 0, unlockedCourses: [] }, { merge: true });
+                        setDoc(userRef, { email: user.email, mixCash: 0, unlockedCourses: [], adWatches: { count: 0, date: new Date().toISOString().split('T')[0] } }, { merge: true });
                     }
                 });
 
@@ -723,6 +797,9 @@
         };
 
         window.openCourse = (courseId) => {
+            // فتح الإعلان عند الدخول للكورس
+            window.triggerAd();
+
             const course = allLiveCourses.find(c => c.id === courseId);
             if(!course) return;
 
@@ -770,6 +847,9 @@
         };
 
         window.playLesson = (videoId, element) => {
+            // فتح الإعلان عند تشغيل الدرس
+            window.triggerAd();
+
             document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
             setIframeSource(videoId);
@@ -777,8 +857,8 @@
 
         function setIframeSource(videoId) {
             const iframe = document.getElementById('lesson-player');
-            // استخدام رابط يوتيوب الأساسي + تعطيل الكيبورد (disablekb=1) لزيادة الحماية
-            iframe.src = `https://www.youtube.com/embed/${videoId}?controls=1&modestbranding=1&rel=0&showinfo=0&autoplay=1&iv_load_policy=3&fs=0&hl=ar&disablekb=1`;
+            // استخدام رابط youtube-nocookie لتجاوز القيود + تبسيط الرابط بدون autoplay إجباري ليعمل الزر بشكل مؤكد
+            iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&controls=1&showinfo=0&autoplay=0`;
         }
 
         window.closeCourseViewer = () => {
